@@ -140,6 +140,8 @@ class ElsGame:
         if swap_index is not None:
             self.opponent.hand[selected_card_index], self.opponent.hand[swap_index] = \
                 self.opponent.hand[swap_index], self.opponent.hand[selected_card_index]
+            return swap_index
+        return None
 
     def game_over(self):
         p1 = self._evaluate_hand(self.player.hand)

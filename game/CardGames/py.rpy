@@ -81,6 +81,39 @@ init python:
         player_card_layout = layout(len(card_game.player.hand), 825, 1700)
         opponent_card_layout = layout(len(card_game.opponent.hand), 20, 1680)
 
+    # ----------------------------
+    # position helpers
+    # ----------------------------
+    def _hand_card_pos(side_index, card):
+        """Position of a specific card in the hand."""
+        hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
+        idx = hand.index(card)
+        if side_index == 0:
+            return HAND0_X + idx * HAND_SPACING, HAND0_Y
+        else:
+            return HAND1_X + idx * HAND_SPACING, HAND1_Y
+
+    def _next_slot_pos(side_index):
+        """Position where the next card would visually land in the hand."""
+        hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
+        idx = len(hand)
+        return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
+
+    def _diff_removed(before, after):
+        """Cards removed from 'before' (order preserved)."""
+        removed = []
+        after_set = set(after)
+        for c in before:
+            if c not in after_set:
+                removed.append(c)
+        return removed
+
+    def _show_anim():
+        renpy.show_screen("table_card_animation")
+
+    def _bias_for(side_index):
+        return card_game.bias["player"] if side_index == 0 else card_game.bias["opponent"]
+
     def reset_card_game():
         s = store
 

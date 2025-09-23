@@ -12,8 +12,22 @@ init:
     default card_game_avatar = None
     default biased_draw = None
 
+    # Layout constants
+    default DECK_X = 50
+    default DECK_Y = 350
+    default DISCARD_X = 1600
+    default DISCARD_Y = 350
+    default HAND0_X = 700
+    default HAND0_Y = 825
+    default HAND1_X = 700
+    default HAND1_Y = 20
+    default HAND_SPACING = 120
+
     # Card selection and layout state
     default hovered_card_index = -1
+    default hovered_card_index_exchange = -1
+    default selected_exchange_card_index_player = -1
+    default selected_exchange_card_index_opponent = -1
 
     # Turn and animation state
     default deal_cards = True
@@ -24,10 +38,6 @@ init:
     default is_drawing = False
     default table_animations = []
     default is_table_animating = False
-
-    # Deck positions
-    $ deck_x = 50
-    $ deck_y = 350
 
     # Card layouts
     default player_card_layout = []
@@ -43,6 +53,15 @@ init:
 
     # Game phase translations
     default card_game_state_tl = {
+        "els": {
+            "player_turn": "Вы вытягиваете",
+            "player_defend": "Вы защищаетесь",
+            "opponent_turn": "Противник вытягивает",
+            "opponent_defend": "Противник защищается",
+            "wait_choice": "Вытягивание карты",
+            "wait_choice_opponent": "Противник вытягивает карту",
+            "round_end": "Игра окончена"
+        },
         "durak" : {
             "player_attack": "Вы атакуете",
             "player_defend": "Вы защищаетесь",

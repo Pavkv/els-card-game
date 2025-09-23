@@ -1,54 +1,5 @@
 init python:
     # ----------------------------
-    # Layout anchors — tweak to your UI
-    # ----------------------------
-    DECK_X,    DECK_Y    = 50, 350
-    DISCARD_X, DISCARD_Y = 1600, 350
-    HAND0_X,   HAND0_Y   = 700, 825   # user hand baseline
-    HAND1_X,   HAND1_Y   = 700,  20   # ai hand baseline
-    HAND_SPACING         = 120
-
-    # global animations list used by your screen
-    if "table_animations" not in globals():
-        table_animations = []
-
-    # ----------------------------
-    # position helpers
-    # ----------------------------
-    def _hand_card_pos(side_index, card):
-        """Approx start position of CARD in hand; replace with your own layout if available."""
-        hand = card_game.players[side_index].hand
-        try:
-            idx = hand.index(card)
-        except ValueError:
-            idx = 0
-        if side_index == 0:
-            return HAND0_X + idx * HAND_SPACING, HAND0_Y
-        else:
-            return HAND1_X + idx * HAND_SPACING, HAND1_Y
-
-    def _next_slot_pos(side_index):
-        """Position where the next card would visually land in the hand."""
-        hand = card_game.players[side_index].hand
-        idx = len(hand)  # simple: to the right of current last card
-        return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
-
-    def _diff_removed(before, after):
-        """Cards removed from 'before' (order preserved)."""
-        removed = []
-        after_set = set(after)
-        for c in before:
-            if c not in after_set:
-                removed.append(c)
-        return removed
-
-    def _show_anim():
-        renpy.show_screen("table_card_animation")
-
-    def _bias_for(side_index):
-        return card_game.bias["player"] if side_index == 0 else card_game.bias["opponent"]
-
-    # ----------------------------
     # USER (side_index = 0) — animations
     # ----------------------------
     def witch_user_discard_pairs_anim(base_delay=0.0, step=0.05):

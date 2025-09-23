@@ -81,12 +81,16 @@ label els_game_loop:
     if card_game.state == "opponent_turn":
 #         $ renpy.block_rollback()
         pause 1.5
-        python:
-            if card_game.turn < 2:
-                index = ai.choose_attack_index(opponent.hand):
-
-        card_game.state = "player_turn"
-        compute_hand_layout()
+        if card_game.turn < 2:
+            $ selected_exchange_card_index_player = card_game.opponent_attack()
+            $ card_game.turn += 1
+            $ card_game.state = "player_defend"
+        else:
+            $ selected_exchange_card_index_player = card_game.opponent_attack()
+            $ card_game.turn = 0
+            $ card_game.round += 1
+            $ card_game.state = "player_turn"
+        $ compute_hand_layout()
 
     call screen els
     jump els_game_loop

@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/CardGames/Els/scripts_els.rpy", line 86: expected statement.
+    card_game.turn += 1
+                   ^
+
+Ren'Py Version: Ren'Py 7.4.11.2266
+Mon Sep 22 20:44:01 2025
