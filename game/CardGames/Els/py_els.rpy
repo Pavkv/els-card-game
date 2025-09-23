@@ -11,8 +11,8 @@ init python:
         src_j = _hand_card_pos(side_index, card_j)
 
         # Use facedown placeholder image for opponent
-        img_i = get_card_image(card_i) if side_index == 1 else base_cover_img_src
-        img_j = get_card_image(card_j) if side_index == 1 else base_cover_img_src
+        img_i = get_card_image(card_i) if side_index == 0 else base_cover_img_src
+        img_j = get_card_image(card_j) if side_index == 0 else base_cover_img_src
 
         # Animate both cards moving to the other's spot
         table_animations[:] = [
@@ -44,6 +44,7 @@ init python:
     # User functions for Els
     def els_user_take_from_opponent_anim(index, base_delay=0.0):
         """Animate user taking a facedown card from AI (exchange/drain)."""
+        global selected_exchange_card_index_opponent
         donor = card_game.opponent
         taker = card_game.player
 
@@ -62,37 +63,36 @@ init python:
             "dest_x": dx, "dest_y": dy, "delay": base_delay, "target": "hand0",
         }]
         _show_anim()
+        compute_hand_layout()
 
-    def els_swap_cards_opponent(selected_exchange_card_index_opponent):
+        card_game.turn = 0
+        card_game.round += 1
+        selected_exchange_card_index_opponent = -1
+        card_game.state = "opponent_turn"
+
+    def els_swap_cards_opponent():
         """Handle opponent's card swap during defense phase."""
+        global selected_exchange_card_index_opponent
         card_game.state = "opponent_defend"
         print(card_game.opponent.hand)
 
         if card_game.turn < 2:
             swap_index = card_game.opponent.choose_defense_swap(selected_exchange_card_index_opponent)
             if swap_index is not None:
-                # ❗ Don't swap here — animate first, then swap inside `els_swap_cards_anim`
                 els_swap_cards_anim(1, selected_exchange_card_index_opponent, swap_index, base_delay=0.5)
                 card_game.turn += 1
                 card_game.state = "player_turn"
             else:
                 els_user_take_from_opponent_anim(selected_exchange_card_index_opponent)
-                selected_exchange_card_index_opponent = -1
-                card_game.turn = 0
-                card_game.round += 1
-                card_game.state = "opponent_turn"
         else:
             els_user_take_from_opponent_anim(selected_exchange_card_index_opponent)
-            selected_exchange_card_index_opponent = -1
-            card_game.turn = 0
-            card_game.round += 1
-            card_game.state = "opponent_turn"
 
         print(card_game.opponent.hand)
         compute_hand_layout()
 
     # AI functions for Els
     def els_ai_take_from_user_anim(index, base_delay=0.0):
+        global selected_exchange_card_index_player
         """Animate AI taking a card from User (exchange/drain)."""
         donor = card_game.player
         taker = card_game.opponent
@@ -109,3 +109,20 @@ init python:
             "dest_x": dx, "dest_y": dy, "delay": base_delay, "target": "hand1",
         }]
         _show_anim()
+        compute_hand_layout()
+
+        card_game.turn = 0
+        card_game.round += 1
+        selected_exchange_card_index_player = -1
+        card_game.state = "player_turn"
+
+    def els_swap_cards_player(selected_card_index, selected_exchange_card_index_player):
+        """Handle player's card swap during defense phase."""
+        print(card_game.player.hand)
+
+        els_swap_cards_anim(0, selected_card_index, selected_exchange_card_index_player)
+        card_game.turn += 1
+        card_game.state = "opponent_turn"
+
+        print(card_game.player.hand)
+        compute_hand_layout()

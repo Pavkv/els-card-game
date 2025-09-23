@@ -26,6 +26,8 @@ init:
     # Card selection and layout state
     default hovered_card_index = -1
     default hovered_card_index_exchange = -1
+    default selected_card_indexes = set()
+    default selected_attack_card_indexes = set()
     default selected_exchange_card_index_player = -1
     default selected_exchange_card_index_opponent = -1
 
@@ -60,7 +62,7 @@ init:
             "opponent_defend": "Противник защищается",
             "wait_choice": "Вытягивание карты",
             "wait_choice_opponent": "Противник вытягивает карту",
-            "round_end": "Игра окончена"
+            "results": "Игра окончена"
         },
         "durak" : {
             "player_attack": "Вы атакуете",
@@ -75,14 +77,14 @@ init:
             "player_turn": "Ваш ход",
             "opponent_turn": "Ход противника",
             "reveal": "Раскрытие",
-            "round_end": "Игра окончена"
+            "results": "Игра окончена"
         },
         "witch": {
             "player_turn": "Ваш ход",
             "opponent_turn": "Ход противника",
             "wait_choice": "Вытягивание карты",
             "wait_choice_opponent": "Противник вытягивает карту",
-            "round_end": "Игра окончена"
+            "results": "Игра окончена"
         }
     }
 

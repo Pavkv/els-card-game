@@ -72,25 +72,26 @@ label els_game_loop:
 #         else:
 #             jump card_games
 
-    if card_game.round == 4:
+    if card_game.state == "opponent_turn":
+#         $ renpy.block_rollback()
+        pause 1.5
+        python:
+            global selected_exchange_card_index_player
+
+            selected_exchange_card_index_player = card_game.opponent_attack()
+
+            if card_game.turn < 2:
+                card_game.state = "player_defend"
+            else:
+                els_ai_take_from_user_anim(selected_exchange_card_index_player)
+
+            compute_hand_layout()
+
+    if card_game.round >= 4:
 #         $ renpy.block_rollback()
         $ card_game.result = card_game.game_over()
         $ print("Game Over: ", card_game.result)
         $ card_game.state = "results"
-
-    if card_game.state == "opponent_turn":
-#         $ renpy.block_rollback()
-        pause 1.5
-        if card_game.turn < 2:
-            $ selected_exchange_card_index_player = card_game.opponent_attack()
-            $ card_game.turn += 1
-            $ card_game.state = "player_defend"
-        else:
-            $ selected_exchange_card_index_player = card_game.opponent_attack()
-            $ card_game.turn = 0
-            $ card_game.round += 1
-            $ card_game.state = "player_turn"
-        $ compute_hand_layout()
 
     call screen els
     jump els_game_loop

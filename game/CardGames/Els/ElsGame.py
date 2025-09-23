@@ -14,7 +14,7 @@ class ElsGame:
         self.first_player = None
         self.current_turn = None
         self.state = None
-        self.round = 0
+        self.round = 1
         self.turn = 0
         self.result = None
 
@@ -134,14 +134,6 @@ class ElsGame:
 
     def opponent_attack(self):
         return self.opponent.choose_attack_index(self.player.hand)
-
-    def opponent_defend(self, selected_card_index):
-        swap_index = self.opponent.choose_defense_swap(selected_card_index)
-        if swap_index is not None:
-            self.opponent.hand[selected_card_index], self.opponent.hand[swap_index] = \
-                self.opponent.hand[swap_index], self.opponent.hand[selected_card_index]
-            return swap_index
-        return None
 
     def game_over(self):
         p1 = self._evaluate_hand(self.player.hand)

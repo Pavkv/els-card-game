@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/Els/scripts_els.rpy", line 86: expected statement.
-    card_game.turn += 1
-                   ^
+File "game/CardGames/py.rpy", line 10: invalid syntax
+    global
+    
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Mon Sep 22 20:44:01 2025
+Tue Sep 23 12:21:15 2025

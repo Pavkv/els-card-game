@@ -81,6 +81,14 @@ init python:
         player_card_layout = layout(len(card_game.player.hand), 825, 1700)
         opponent_card_layout = layout(len(card_game.opponent.hand), 20, 1680)
 
+    def handle_card_action(card_game, index):
+        global selected_exchange_card_index_player
+        if isinstance(card_game, DurakCardGame):
+            return Function(handle_card_click, index)
+        elif isinstance(card_game, ElsGame):
+            return Function(lambda: els_swap_cards_player(index, selected_exchange_card_index_player))
+        return Return()
+
     # ----------------------------
     # position helpers
     # ----------------------------

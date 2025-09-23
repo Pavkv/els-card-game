@@ -6,6 +6,9 @@ screen card_game_base_ui():
 
     add cards_bg xpos 0 ypos 0 xysize (1920, 1080)
 
+    if card_game.state == "results" or card_game.result:
+        timer 0.5 action Jump(card_game_name + "_game_loop")
+
     if not in_game:
         frame:
             xpos 1755
@@ -136,7 +139,18 @@ screen card_game_base_ui():
                         text_size 18
                         action [Function(witch_user_take_from_ai_anim, selected_exchange_card_index_opponent), SetVariable("selected_exchange_card_index_opponent", -1), SetVariable("hovered_card_index_exchange", -1)]
 
-        elif isinstance(card_game, ElsGame) and card_game.state == "player_turn" and selected_exchange_card_index_opponent != -1:
+        elif isinstance(card_game, ElsGame):
+            if not card_game.result:
+                frame:
+                    background RoundRect("#b2b3b4", 10)
+                    xsize 150
+                    yoffset 5
+                    ypos 20
+                    padding (5, 5)
+                    $ text = "Раунд {}/3 Обмен {}/2".format(card_game.round, card_game.turn)
+                    text "[text]" color "#FFFFFF" text_align 0.5 align (0.5, 0.5)
+
+            if card_game.state == "player_turn" and selected_exchange_card_index_opponent != -1:
                 frame:
                     xsize 150
                     padding (0, 0)
@@ -145,7 +159,18 @@ screen card_game_base_ui():
                     textbutton "{color=#fff}Подтвердить{/color}":
                         style "card_game_button"
                         text_size 18
-                        action [Function(els_swap_cards_opponent, selected_exchange_card_index_opponent), SetVariable("hovered_card_index_exchange", -1)]
+                        action [Function(els_swap_cards_opponent), SetVariable("hovered_card_index_exchange", -1)]
+
+            if card_game.state == "player_defend" and selected_exchange_card_index_player != -1:
+                frame:
+                    xsize 150
+                    padding (0, 0)
+                    ypos 30
+                    has vbox
+                    textbutton "{color=#fff}Отдать карту{/color}":
+                        style "card_game_button"
+                        text_size 18
+                        action [Function(els_ai_take_from_user_anim, selected_exchange_card_index_player), SetVariable("hovered_card_index_exchange", -1), SetVariable("card_game.state", "player_turn")]
 
     # Deck and Trump Card
     $ deck_text = str(len(card_game.deck.cards)) if len(card_game.deck.cards) > 0 else card_suits[card_game.deck.trump_suit]
@@ -249,7 +274,7 @@ screen card_game_base_ui():
 
             $ is_hovered = (i == hovered_card_index)
             $ is_adjacent = abs(i - hovered_card_index) == 1
-            $ is_selected = (i in selected_attack_card_indexes)
+            $ is_selected = (i in [selected_attack_card_indexes, selected_exchange_card_index_player])
 
             $ x_shift = 20 if i == hovered_card_index + 1 else (-20 if i == hovered_card_index - 1 else 0)
             $ y_shift = -80 if is_hovered or is_selected else 0
@@ -259,16 +284,9 @@ screen card_game_base_ui():
                 xpos card_x
                 ypos card_y
                 at hover_offset(y=y_shift, x=x_shift)
-                action If(
-                    isinstance(card_game, DurakCardGame),
-                    Function(handle_card_click, i),
-                    Return()
-                )
+                action handle_card_action(card_game, i)
                 hovered If(hovered_card_index != i, SetVariable("hovered_card_index", i))
                 unhovered If(hovered_card_index == i, SetVariable("hovered_card_index", -1))
-
-    if card_game.state == "result" or card_game.result:
-        timer 0.5 action Jump(card_game_name + "_game_loop")
 
 screen deal_cards():
 
@@ -331,6 +349,6 @@ screen table_card_animation():
         $ delay = anim["delay"]
         $ is_discard = anim["target"] == "discard"
 
-        add Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT)) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, is_discard)
+        add Transform(anim.get("override_img", get_card_image(card)), xysize=(CARD_WIDTH, CARD_HEIGHT)) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, is_discard)
 
     timer 0.5 action Hide("table_card_animation")

@@ -11,6 +11,7 @@ screen els():
             background None
             xpos 1750
             ypos 945
+
 #             if selected_exchange_card_index_opponent != -1:
 #                 frame:
 #                     xsize 150
