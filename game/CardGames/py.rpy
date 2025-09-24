@@ -81,25 +81,30 @@ init python:
         player_card_layout = layout(len(card_game.player.hand), 825, 1700)
         opponent_card_layout = layout(len(card_game.opponent.hand), 20, 1680)
 
+    def is_card_animating(card):
+        for anim in table_animations:
+            if anim["card"] == card:
+                return True
+        return False
+
     def handle_card_action(card_game, index):
         global selected_exchange_card_index_player
         if isinstance(card_game, DurakCardGame):
             return Function(handle_card_click, index)
-        elif isinstance(card_game, ElsGame):
-            return Function(lambda: els_swap_cards_player(index, selected_exchange_card_index_player))
+        elif isinstance(card_game, ElsGame) and card_game.state == "player_defend":
+            return Function(lambda: els_swap_cards_player(index))
         return Return()
 
     # ----------------------------
     # position helpers
     # ----------------------------
     def _hand_card_pos(side_index, card):
-        """Position of a specific card in the hand."""
+        """Return the layout position (x, y) of the given card in hand layout."""
+        layout = player_card_layout if side_index == 0 else opponent_card_layout
         hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
+
         idx = hand.index(card)
-        if side_index == 0:
-            return HAND0_X + idx * HAND_SPACING, HAND0_Y
-        else:
-            return HAND1_X + idx * HAND_SPACING, HAND1_Y
+        return layout[idx]["x"], layout[idx]["y"]
 
     def _next_slot_pos(side_index):
         """Position where the next card would visually land in the hand."""

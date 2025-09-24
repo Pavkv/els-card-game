@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/py.rpy", line 10: invalid syntax
-    global
-    
+File "game/CardGames/card_game_screens.rpy", line 229: u'continue' is not a keyword argument or valid child for the for statement.
+    continue
+            ^
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Tue Sep 23 12:21:15 2025
+Wed Sep 24 13:22:35 2025

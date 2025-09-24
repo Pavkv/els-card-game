@@ -21,7 +21,7 @@ init:
     default HAND0_Y = 825
     default HAND1_X = 700
     default HAND1_Y = 20
-    default HAND_SPACING = 120
+    default HAND_SPACING = 118
 
     # Card selection and layout state
     default hovered_card_index = -1
@@ -40,6 +40,7 @@ init:
     default is_drawing = False
     default table_animations = []
     default is_table_animating = False
+    default in_flight_cards = set()
 
     # Card layouts
     default player_card_layout = []
@@ -103,12 +104,13 @@ init:
         pause delay
         linear 0.3 alpha 1.0 xpos dest_x ypos dest_y
 
-    transform animate_table_card(x1, y1, x2, y2, delay=0.0, discard=False):
+    transform animate_table_card(x1, y1, x2, y2, delay=0.0, duration=0.4, discard=False):
         alpha 1.0
         xpos x1
         ypos y1
         pause delay
-        linear 0.4 xpos x2 ypos y2 alpha 0
+
+        linear duration xpos x2 ypos y2 alpha 0
 
     # Styles
     style card_game_button:

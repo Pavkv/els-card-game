@@ -6,9 +6,6 @@ screen card_game_base_ui():
 
     add cards_bg xpos 0 ypos 0 xysize (1920, 1080)
 
-    if card_game.state == "results" or card_game.result:
-        timer 0.5 action Jump(card_game_name + "_game_loop")
-
     if not in_game:
         frame:
             xpos 1755
@@ -140,14 +137,14 @@ screen card_game_base_ui():
                         action [Function(witch_user_take_from_ai_anim, selected_exchange_card_index_opponent), SetVariable("selected_exchange_card_index_opponent", -1), SetVariable("hovered_card_index_exchange", -1)]
 
         elif isinstance(card_game, ElsGame):
-            if not card_game.result:
+            if card_game.round < 5:
                 frame:
                     background RoundRect("#b2b3b4", 10)
                     xsize 150
                     yoffset 5
                     ypos 20
                     padding (5, 5)
-                    $ text = "Раунд {}/3 Обмен {}/2".format(card_game.round, card_game.turn)
+                    $ text = "Раунд {}/4 Обмен {}/2".format(card_game.round, card_game.turn)
                     text "[text]" color "#FFFFFF" text_align 0.5 align (0.5, 0.5)
 
             if card_game.state == "player_turn" and selected_exchange_card_index_opponent != -1:
@@ -208,13 +205,16 @@ screen card_game_base_ui():
 
     if not deal_cards:
         # Opponent hand
-        if isinstance(card_game, Game21):
-            $ opponent_total = card_game.opponent.total21()
-            $ opponent_hand_total = "Цена: " + (
-                str(opponent_total) if card_game.state in ("reveal", "results")
-                else "#" if opponent_total < 10
-                else "##"
-            )
+        if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.round == 5):
+            if isinstance(card_game, Game21):
+                $ opponent_total = card_game.opponent.total21()
+                $ opponent_hand_text = "Цена: " + (
+                    str(opponent_total) if card_game.state in ("reveal", "results")
+                    else "#" if opponent_total < 10
+                    else "##"
+                )
+            else:
+                $ opponent_hand_text = result_combination_opponent
             frame:
                 background RoundRect("#b2b3b4", 10)
                 xpos 885
@@ -222,71 +222,99 @@ screen card_game_base_ui():
                 xsize 150
                 yoffset 10
                 padding (5, 5)
-                text opponent_hand_total color "#ffffff" text_align 0.5 align (0.5, 0.5) size 25
+                text "[opponent_hand_text]" color "#ffffff" text_align 0.5 align (0.5, 0.5) size 25
 
         for i, card in enumerate(card_game.opponent.hand):
-            $ card_x = opponent_card_layout[i]["x"]
-            $ card_y = opponent_card_layout[i]["y"]
+            if not card in in_flight_cards:
+                $ card_x = opponent_card_layout[i]["x"]
+                $ card_y = opponent_card_layout[i]["y"]
 
-            if isinstance(card_game, Game21) or isinstance(card_game, WitchGame) and card_game.state == "result" or card_game.result:
-                add Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT)):
-                    xpos card_x
-                    ypos card_y
-            elif (isinstance(card_game, WitchGame) and card_game.state == "wait_choice") or (isinstance(card_game, ElsGame) and card_game.state == "player_turn"):
-                $ is_hovered = (i == hovered_card_index_exchange)
-                $ is_adjacent = abs(i - hovered_card_index_exchange) == 1
-                $ is_selected = (i == selected_exchange_card_index_opponent)
+                if isinstance(card_game, Game21) or isinstance(card_game, WitchGame) and card_game.state == "result" or card_game.result:
+                    add Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT)):
+                        xpos card_x
+                        ypos card_y
+                elif (isinstance(card_game, WitchGame) and card_game.state == "wait_choice") or (isinstance(card_game, ElsGame) and card_game.state == "player_turn"):
+                    $ is_hovered = (i == hovered_card_index_exchange)
+                    $ is_adjacent = abs(i - hovered_card_index_exchange) == 1
+                    $ is_selected = (i == selected_exchange_card_index_opponent)
 
-                $ x_shift = 20 if i == hovered_card_index_exchange + 1 else (-20 if i == hovered_card_index_exchange - 1 else 0)
-                $ y_shift = 80 if is_hovered or is_selected else 0
-                imagebutton:
-                    idle Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT))
-                    hover Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT))
-                    xpos card_x
-                    ypos card_y
-                    at hover_offset(y=y_shift, x=x_shift)
-                    action If(
-                        (isinstance(card_game, WitchGame) or isinstance(card_game, ElsGame)),
-                        SetVariable("selected_exchange_card_index_opponent", i),
-                        Return()
-                    )
-                    hovered If(hovered_card_index_exchange != i, SetVariable("hovered_card_index_exchange", i))
-                    unhovered If(hovered_card_index_exchange == i, SetVariable("hovered_card_index_exchange", -1))
-            else:
-                add Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT)):
-                    xpos card_x
-                    ypos card_y
+                    $ x_shift = 20 if i == hovered_card_index_exchange + 1 else (-20 if i == hovered_card_index_exchange - 1 else 0)
+                    $ y_shift = 80 if is_hovered or is_selected else 0
+                    imagebutton:
+                        idle Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        hover Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        xpos card_x
+                        ypos card_y
+                        at hover_offset(y=y_shift, x=x_shift)
+                        action If(
+                            (isinstance(card_game, WitchGame) or isinstance(card_game, ElsGame)),
+                            SetVariable("selected_exchange_card_index_opponent", i),
+                            Return()
+                        )
+                        hovered If(hovered_card_index_exchange != i, SetVariable("hovered_card_index_exchange", i))
+                        unhovered If(hovered_card_index_exchange == i, SetVariable("hovered_card_index_exchange", -1))
+                elif isinstance(card_game, ElsGame) and card_game.state == "results":
+                    $ is_selected = (i in result_combination_indexes_opponent)
+                    $ x_shift = 0
+                    $ y_shift = 80 if is_selected else 0
+                    imagebutton:
+                        idle Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        hover Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        xpos card_x
+                        ypos card_y
+                        at hover_offset(y=y_shift, x=x_shift)
+                else:
+                    add Transform(base_cover_img_src, xysize=(CARD_WIDTH, CARD_HEIGHT)):
+                        xpos card_x
+                        ypos card_y
 
         # Player hand
-        if isinstance(card_game, Game21):
-            $ player_hand_total = "Цена: " + str(card_game.player.total21())
+        if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.round == 5):
+            if isinstance(card_game, Game21):
+                $ player_hand_text = "Цена: " + str(card_game.player.total21())
+            else:
+                $ player_hand_text = result_combination_player
             frame:
                 background RoundRect("#b2b3b4", 10)
                 xpos 885
                 ypos 705
                 xsize 150
                 padding (5, 5)
-                text player_hand_total color "#ffffff" text_align 0.5 align (0.5, 0.5) size 25
+                text "[player_hand_text]" color "#ffffff" text_align 0.5 align (0.5, 0.5) size 25
 
         for i, card in enumerate(card_game.player.hand):
-            $ card_x = player_card_layout[i]["x"]
-            $ card_y = player_card_layout[i]["y"]
+            if not card in in_flight_cards:
+                $ card_x = player_card_layout[i]["x"]
+                $ card_y = player_card_layout[i]["y"]
+                if isinstance(card_game, ElsGame) and card_game.state == "results":
+                    $ is_selected = (i in result_combination_indexes_player)
+                    $ x_shift = 0
+                    $ y_shift = -80 if is_selected else 0
+                    imagebutton:
+                        idle Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        hover Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        xpos card_x
+                        ypos card_y
+                        at hover_offset(y=y_shift, x=x_shift)
+                else:
+                    $ is_hovered = (i == hovered_card_index)
+                    $ is_adjacent = abs(i - hovered_card_index) == 1
+                    $ is_selected = (i in [selected_attack_card_indexes, selected_exchange_card_index_player])
 
-            $ is_hovered = (i == hovered_card_index)
-            $ is_adjacent = abs(i - hovered_card_index) == 1
-            $ is_selected = (i in [selected_attack_card_indexes, selected_exchange_card_index_player])
+                    $ x_shift = 20 if i == hovered_card_index + 1 else (-20 if i == hovered_card_index - 1 else 0)
+                    $ y_shift = -80 if is_hovered or is_selected else 0
+                    imagebutton:
+                        idle Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        hover Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
+                        xpos card_x
+                        ypos card_y
+                        at hover_offset(y=y_shift, x=x_shift)
+                        action handle_card_action(card_game, i)
+                        hovered If(hovered_card_index != i, SetVariable("hovered_card_index", i))
+                        unhovered If(hovered_card_index == i, SetVariable("hovered_card_index", -1))
 
-            $ x_shift = 20 if i == hovered_card_index + 1 else (-20 if i == hovered_card_index - 1 else 0)
-            $ y_shift = -80 if is_hovered or is_selected else 0
-            imagebutton:
-                idle Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
-                hover Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))
-                xpos card_x
-                ypos card_y
-                at hover_offset(y=y_shift, x=x_shift)
-                action handle_card_action(card_game, i)
-                hovered If(hovered_card_index != i, SetVariable("hovered_card_index", i))
-                unhovered If(hovered_card_index == i, SetVariable("hovered_card_index", -1))
+    if card_game.state == "results" or card_game.result:
+        timer 0.5 action Jump(card_game_name + "_game_loop")
 
 screen deal_cards():
 
@@ -338,17 +366,31 @@ screen draw_cards():
 
 screen table_card_animation():
 
-    # Animate table cards moving to hand or discard
-    for anim in table_animations:
+    default max_duration = 0.0
 
+    for anim in table_animations:
         $ card = anim["card"]
         $ src_x = anim["src_x"]
         $ src_y = anim["src_y"]
         $ dest_x = anim["dest_x"]
         $ dest_y = anim["dest_y"]
         $ delay = anim["delay"]
+        $ duration = anim.get("duration", 0.4)
         $ is_discard = anim["target"] == "discard"
 
-        add Transform(anim.get("override_img", get_card_image(card)), xysize=(CARD_WIDTH, CARD_HEIGHT)) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, is_discard)
+        # Prevent card from showing in hand
+        $ in_flight_cards.add(card)
 
-    timer 0.5 action Hide("table_card_animation")
+        $ max_duration = max(max_duration, delay + duration)
+
+        add Transform(
+            anim.get("override_img", get_card_image(card)),
+            xysize=(CARD_WIDTH, CARD_HEIGHT)
+        ) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, duration, is_discard)
+
+    timer max_duration + 0.01 action [
+        SetVariable("table_animations", []),
+        SetVariable("in_flight_cards", set()),
+        Function(renpy.restart_interaction),
+        Hide("table_card_animation"),
+    ]

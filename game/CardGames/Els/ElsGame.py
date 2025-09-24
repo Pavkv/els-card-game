@@ -15,7 +15,7 @@ class ElsGame:
         self.current_turn = None
         self.state = None
         self.round = 1
-        self.turn = 0
+        self.turn = 1
         self.result = None
 
         self.bias = {"player": 0.0, "opponent": 0.0}
@@ -41,10 +41,8 @@ class ElsGame:
     def _evaluate_hand(self, cards):
         ranks = [card.rank for card in cards]
         suits = [card.suit for card in cards]
-
         rank_order = Card.rank_values
 
-        # Manually count ranks and suits
         rank_counts = {}
         suit_counts = {}
         for r in ranks:
@@ -52,7 +50,6 @@ class ElsGame:
         for s in suits:
             suit_counts[s] = suit_counts.get(s, 0) + 1
 
-        # Convert to rank values
         rank_values = sorted([rank_order[r] for r in ranks], reverse=True)
 
         def is_straight(values):
@@ -63,26 +60,25 @@ class ElsGame:
                     return True, window
             return False, []
 
-        # Detect flush
         flush_suit = None
         for suit in suit_counts:
             if suit_counts[suit] >= 5:
                 flush_suit = suit
                 break
 
-        flush_values = []
+        flush_cards = []
         if flush_suit:
-            flush_values = [rank_order[card.rank] for card in cards if card.suit == flush_suit]
-            flush_values.sort(reverse=True)
+            flush_cards = [card for card in cards if card.suit == flush_suit]
+            flush_cards.sort(key=lambda c: rank_order[c.rank], reverse=True)
 
-        # Detect straight and straight flush
         is_straight_all, straight_vals = is_straight(rank_values)
         is_straight_flush, straight_flush_vals = False, []
         if flush_suit:
-            is_straight_flush, straight_flush_vals = is_straight(flush_values)
+            flush_flush_values = [rank_order[c.rank] for c in flush_cards]
+            is_straight_flush, straight_flush_vals = is_straight(flush_flush_values)
 
-        # Build reverse frequency dict: freq -> [ranks]
-        freq_map = {}  # freq: list of rank values
+        # Frequency map
+        freq_map = {}
         for rank in rank_counts:
             count = rank_counts[rank]
             val = rank_order[rank]
@@ -90,41 +86,87 @@ class ElsGame:
                 freq_map[count] = []
             freq_map[count].append(val)
 
-        # Sort each frequency list high to low
         for freq in freq_map:
             freq_map[freq].sort(reverse=True)
 
-        def hand(name, rank, tiebreakers):
-            return name, rank, tiebreakers
+        def hand(name, rank, tiebreakers, combo_cards):
+            # Get indexes in original hand
+            indices = [cards.index(card) for card in combo_cards]
+            return name, rank, tiebreakers, indices
 
         if is_straight_flush and max(straight_flush_vals) == rank_order['A']:
-            return hand("Royal Flush", 10, [rank_order['A']])
+            combo_cards = []
+            for v in straight_flush_vals:
+                for c in flush_cards:
+                    if rank_order[c.rank] == v and c not in combo_cards:
+                        combo_cards.append(c)
+                        break
+            return hand("Роял-флеш", 10, [rank_order['A']], combo_cards)
+
         elif is_straight_flush:
-            return hand("Straight Flush", 9, straight_flush_vals)
+            combo_cards = []
+            for v in straight_flush_vals:
+                for c in flush_cards:
+                    if rank_order[c.rank] == v and c not in combo_cards:
+                        combo_cards.append(c)
+                        break
+            return hand("Стрит-флэш", 9, straight_flush_vals, combo_cards)
+
         elif 4 in freq_map:
             four = freq_map[4][0]
-            kickers = [v for v in rank_values if v != four]
-            return hand("Four of a Kind", 8, [four] + kickers[:1])
+            kicker = [v for v in rank_values if v != four][0]
+            combo_cards = [c for c in cards if rank_order[c.rank] == four][:4]
+            combo_cards += [c for c in cards if rank_order[c.rank] == kicker][:1]
+            return hand("Каре", 8, [four, kicker], combo_cards)
+
         elif 3 in freq_map and 2 in freq_map:
-            return hand("Full House", 7, [freq_map[3][0], freq_map[2][0]])
+            three = freq_map[3][0]
+            two = freq_map[2][0]
+            combo_cards = [c for c in cards if rank_order[c.rank] == three][:3]
+            combo_cards += [c for c in cards if rank_order[c.rank] == two][:2]
+            return hand("Фулл-хаус", 7, [three, two], combo_cards)
+
         elif flush_suit:
-            return hand("Flush", 6, flush_values[:5])
+            combo_cards = flush_cards[:5]
+            values = [rank_order[c.rank] for c in combo_cards]
+            return hand("Флэш", 6, values, combo_cards)
+
         elif is_straight_all:
-            return hand("Straight", 5, straight_vals)
+            combo_cards = []
+            for v in straight_vals:
+                for c in sorted(cards, key=lambda c: rank_order[c.rank], reverse=True):
+                    if rank_order[c.rank] == v and c not in combo_cards:
+                        combo_cards.append(c)
+                        break
+            return hand("Стрит", 5, straight_vals, combo_cards)
+
         elif 3 in freq_map:
             three = freq_map[3][0]
-            kickers = [v for v in rank_values if v != three]
-            return hand("Three of a Kind", 4, [three] + kickers[:2])
+            kickers = [v for v in rank_values if v != three][:2]
+            combo_cards = [c for c in cards if rank_order[c.rank] == three][:3]
+            combo_cards += [c for c in cards if rank_order[c.rank] in kickers][:2]
+            return hand("Тройка", 4, [three] + kickers, combo_cards)
+
         elif 2 in freq_map and len(freq_map[2]) >= 2:
-            pairs = freq_map[2][:2]
-            kicker = [v for v in rank_values if v not in pairs][0]
-            return hand("Two Pair", 3, pairs + [kicker])
+            pair1, pair2 = freq_map[2][:2]
+            kicker = [v for v in rank_values if v not in (pair1, pair2)][0]
+            combo_cards = []
+            combo_cards += [c for c in cards if rank_order[c.rank] == pair1][:2]
+            combo_cards += [c for c in cards if rank_order[c.rank] == pair2][:2]
+            combo_cards += [c for c in cards if rank_order[c.rank] == kicker][:1]
+            return hand("Две Пары", 3, [pair1, pair2, kicker], combo_cards)
+
         elif 2 in freq_map:
             pair = freq_map[2][0]
-            kickers = [v for v in rank_values if v != pair]
-            return hand("One Pair", 2, [pair] + kickers[:3])
+            kickers = [v for v in rank_values if v != pair][:3]
+            combo_cards = [c for c in cards if rank_order[c.rank] == pair][:2]
+            combo_cards += [c for c in cards if rank_order[c.rank] in kickers][:3]
+            return hand("Пара", 2, [pair] + kickers, combo_cards)
+
         else:
-            return hand("High Card", 1, rank_values[:5])
+            combo_cards = sorted(cards, key=lambda c: rank_order[c.rank], reverse=True)[:5]
+            values = [rank_order[c.rank] for c in combo_cards]
+            return hand("Старшая Карта", 1, values, combo_cards)
 
     # ---------- externals ----------
     def start_game(self):
@@ -145,3 +187,5 @@ class ElsGame:
             self.result = self.opponent.name
         else:
             self.result = "draw"
+
+        return self.result, p1, p2
