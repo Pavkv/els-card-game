@@ -7,10 +7,14 @@ init python:
     from CardGames.Witch.WitchGame import WitchGame
     from game.CardGames.Els.ElsGame import ElsGame
 
+    # Global variables
     CARD_WIDTH, CARD_HEIGHT, CARD_SPACING = 157, 237, 118
     suits = {'C': 'uvao', 'D': '2ch', 'H': 'ussr', 'S': 'utan'}
     ranks = {'6': '6', '7': '7', '8': '8', '9': '9', '10': '10', 'J': '11', 'Q': '12', 'K': '13', 'A': '1'} # '2': '2', '3': '3', '4': '4', '5': '5',
 
+    # ----------------------------
+    # Game Setup Functions
+    # ----------------------------
     def get_card_image(card):
         """Returns the image path for a card based on its rank and suit."""
         return base_card_img_src + "/{}_{}.png".format(ranks[card.rank], suits[card.suit])
@@ -88,7 +92,6 @@ init python:
         return False
 
     def handle_card_action(card_game, index):
-        global selected_exchange_card_index_player
         if isinstance(card_game, DurakCardGame):
             return Function(handle_card_click, index)
         elif isinstance(card_game, ElsGame) and card_game.state == "player_defend":
@@ -96,9 +99,9 @@ init python:
         return Return()
 
     # ----------------------------
-    # position helpers
+    # Position Helpers
     # ----------------------------
-    def _hand_card_pos(side_index, card):
+    def hand_card_pos(side_index, card):
         """Return the layout position (x, y) of the given card in hand layout."""
         layout = player_card_layout if side_index == 0 else opponent_card_layout
         hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
@@ -106,13 +109,13 @@ init python:
         idx = hand.index(card)
         return layout[idx]["x"], layout[idx]["y"]
 
-    def _next_slot_pos(side_index):
+    def next_slot_pos(side_index):
         """Position where the next card would visually land in the hand."""
         hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
         idx = len(hand)
         return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
 
-    def _diff_removed(before, after):
+    def diff_removed(before, after):
         """Cards removed from 'before' (order preserved)."""
         removed = []
         after_set = set(after)
@@ -121,12 +124,168 @@ init python:
                 removed.append(c)
         return removed
 
-    def _show_anim():
+    def show_anim():
         renpy.show_screen("table_card_animation")
 
-    def _bias_for(side_index):
+    def bias_for(side_index):
         return card_game.bias["player"] if side_index == 0 else card_game.bias["opponent"]
 
+    # ----------------------------
+    # Game Start Function
+    # ----------------------------
+    def start_card_game(game_class, game_name, num_of_cards=6, sort_hand=False):
+        """
+        Initializes any card game with dealing animation setup.
+
+        Arguments:
+        - game_class: the class of the game (e.g., WitchGame)
+        - game_name: string name of the game (e.g., "witch")
+        - base_cover_src: base path to card back image
+        - player_name, opponent_name: names of the players
+        - opponent_avatar: avatar image for the opponent
+        - biased_draw: optional bias config
+        """
+        global card_game, player_name, opponent_name, biased_draw, card_game_name
+        global base_cover_img_src, base_card_img_src, card_game_avatar
+        global dealt_cards, is_dealing, deal_cards
+
+        card_game = game_class(player_name, opponent_name, biased_draw)
+        card_game_name = game_name
+        base_cover_img_src = base_card_img_src + "/cover.png"
+        card_game.opponent.avatar = card_game_avatar
+
+        card_game.start_game(num_of_cards, sort_hand)
+        compute_hand_layout()
+
+        dealt_cards = []
+        is_dealing = True
+        deal_cards = True
+
+        delay = 0.0
+        for i in range(len(card_game.player.hand)):
+            dealt_cards.append({
+                "owner": "player",
+                "index": i,
+                "delay": delay
+            })
+            delay += 0.1
+
+        for i in range(len(card_game.opponent.hand)):
+            dealt_cards.append({
+                "owner": "opponent",
+                "index": i,
+                "delay": delay
+            })
+            delay += 0.1
+
+        renpy.show_screen("card_game_base_ui")
+        renpy.jump(game_name + "_game_loop")
+
+    # ----------------------------
+    # In Game Functions
+    # ----------------------------
+    def draw_anim(side, target_count=6, step_delay=0.05):
+        """
+        Animate drawing cards for the given side (0 = player, 1 = opponent)
+        until the hand has `target_count` cards or the deck is empty.
+        """
+        d = 0.0
+        table_animations[:] = []
+
+        player = card_game.players[side]
+        bias_key = "player" if side == 0 else "opponent"
+        target = "hand{}".format(side)
+
+        while len(player.hand) < target_count and not card_game.deck.is_empty():
+            dest_x, dest_y = next_slot_pos(side)
+
+            player.draw_from_deck(
+                card_game.deck,
+                target_count,
+                sort_hand=False,
+                trump_suit=None,
+                good_prob=card_game.bias[bias_key]
+            )
+
+            card = player.hand[-1]
+            table_animations.append({
+                "card": card,
+                "src_x": DECK_X,
+                "src_y": DECK_Y,
+                "dest_x": dest_x,
+                "dest_y": dest_y,
+                "delay": d,
+                "target": target,
+            })
+
+            d += step_delay
+
+        if table_animations:
+            _show_anim()
+
+        compute_hand_layout()
+
+    def take_card_anim(
+        from_side,
+        to_side,
+        index,
+        base_delay=0.1,
+        duration=0.4,
+        override_img=None,
+    ):
+        """
+        Animate a card being taken from one player to another.
+
+        Parameters:
+            from_side (int): 0 = player, 1 = opponent (donor)
+            to_side (int): 0 = player, 1 = opponent (taker)
+            index (int): index of the card to take from donor
+            base_delay (float): delay before animation
+            duration (float): animation duration
+            override_img (str or None): override image for animation (e.g. face-down card)
+        """
+        donor = card_game.players[from_side]
+        taker = card_game.players[to_side]
+
+        # Get card and its visual source position
+        src_card = donor.hand[index] if index < len(donor.hand) else donor.hand[-1]
+        sx, sy = hand_card_pos(from_side, src_card)
+        dx, dy = next_slot_pos(to_side)
+
+        # Perform the take
+        taken = taker.take_card_from(donor, index=index)
+
+        if hasattr(taker, 'on_after_take'):
+            taker.on_after_take(donor, taken)
+
+        # Temporarily remove card from taker's hand so it doesn't flash early
+        taker.hand.remove(taken)
+        compute_hand_layout()
+
+        # Determine animation image
+        if override_img is None:
+            override_img = get_card_image(taken) if to_side == 1 else base_cover_img_src
+
+        table_animations[:] = [{
+            "card": taken,
+            "src_x": sx,
+            "src_y": sy,
+            "dest_x": dx,
+            "dest_y": dy,
+            "delay": base_delay,
+            "duration": duration,
+            "target": "hand{}".format(to_side),
+            "override_img": override_img,
+        }]
+        show_anim()
+
+        # Return the card to taker's hand
+        taker.hand.append(taken)
+        compute_hand_layout()
+
+    # ----------------------------
+    # Reset Game Function
+    # ----------------------------
     def reset_card_game():
         s = store
 
@@ -164,3 +323,9 @@ init python:
         # witch-specific
         s.hovered_card_index_exchange = -1
         s.selected_exchange_card_index = -1
+
+        # els-specific
+        s.result_combination_player = None
+        s.result_combination_indexes_player = set()
+        s.result_combination_opponent = None
+        s.result_combination_indexes_opponent = set()

@@ -17,13 +17,10 @@ class Player(object):
     def __len__(self):
         return len(self.hand)
 
-    def draw_from_deck(self, deck, trump_suit=None, good_prob=0.0):
-        if good_prob != 0.0:
-            self.hand.extend(deck.deal_biased(len(self.hand), good_prob))
-        else:
-            self.hand.extend(deck.deal(len(self.hand)))
-        if trump_suit is not None:
-            self.sort_hand(trump_suit)
+    def draw_from_deck(self, deck, n, sort_hand=False, good_prob=0.0):
+        self.hand.extend(deck.deal_biased(n, len(self.hand), good_prob))
+        if sort_hand:
+            self.sort_hand(deck.trump_suit)
 
     def sort_hand(self, trump_suit):
         def card_sort_key(card):

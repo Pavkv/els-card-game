@@ -2,9 +2,10 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/card_game_screens.rpy", line 229: u'continue' is not a keyword argument or valid child for the for statement.
-    continue
-            ^
+File "game/CardGames/py.rpy", line 197: invalid syntax
+        target = f"hand{side}"
+                              ^
+    
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Wed Sep 24 13:22:35 2025
+Thu Sep 25 13:57:17 2025

@@ -9,6 +9,12 @@ class Deck:
         self.trump_card = self.get_trump_card()
         self.trump_suit = self.trump_card.suit if self.trump_card else None
 
+    def is_empty(self):
+        return len(self.cards) == 0
+
+    def remaining(self):
+        return len(self.cards)
+
     def shuffle(self):
         random.shuffle(self.cards)
 
@@ -17,11 +23,6 @@ class Deck:
 
     def draw_top(self):
         return self.cards.pop(0) if self.cards else None
-
-    def deal(self, current_hand_size):
-        need = max(0, 6 - current_hand_size)
-        take = min(need, len(self.cards))
-        return [self.draw_top() for _ in range(take)]
 
     def draw_with_bias(self, good_prob):
         if not self.cards:
@@ -36,13 +37,7 @@ class Deck:
 
         return self.draw_top()
 
-    def deal_biased(self, current_hand_size, good_prob):
-        need = max(0, 6 - current_hand_size)
+    def deal_biased(self, n, current_hand_size, good_prob):
+        need = max(0, n - current_hand_size)
         take = min(need, len(self.cards))
         return [self.draw_with_bias(good_prob) for _ in range(take)]
-
-    def is_empty(self):
-        return len(self.cards) == 0
-
-    def remaining(self):
-        return len(self.cards)
