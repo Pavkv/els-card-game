@@ -2,10 +2,10 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/py.rpy", line 197: invalid syntax
-        target = f"hand{side}"
-                              ^
+File "game/CardGames/py.rpy", line 124: invalid syntax
+                print(f"Card {card} not found in hand during hand_card_pos.")
+                                                                            ^
     
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Thu Sep 25 13:57:17 2025
+Thu Sep 25 15:56:58 2025

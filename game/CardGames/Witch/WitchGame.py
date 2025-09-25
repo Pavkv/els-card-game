@@ -23,8 +23,8 @@ class WitchGame(CardGame):
         if len(self.opponent.hand) == 0 and len(self.player.hand) > 1 and self.deck.is_empty():
             return True, self.opponent.name
         if len(self.player.hand) == 1 and len(self.opponent.hand) == 1:
-            if self.player.hand.has_only_witch():
+            if self.player.has_only_witch():
                 return True, self.opponent.name
-            if self.opponent.hand.has_only_witch():
+            if self.opponent.has_only_witch():
                 return True, self.player.name
         return False, None

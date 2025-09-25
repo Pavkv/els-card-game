@@ -1,78 +1,54 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/CardGames/Els/scripts_els.rpy", line 37, in script
-    call screen els
-  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
-  File "renpy/common/00action_other.rpy", line 537, in __call__
-    rv = self.callable(*self.args, **self.kwargs)
-  File "game/CardGames/Els/py_els.rpy", line 115, in els_opponent_take_from_user
-    take_card_anim(from_side=0, to_side=1, index=selected_exchange_card_index_player)
-  File "game/CardGames/py.rpy", line 247, in take_card_anim
-    donor = card_game.players[from_side]
-AttributeError: ElsGame instance has no attribute 'players'
+  File "game/CardGames/Witch/scripts_witch.rpy", line 23, in script
+    pause 3.0
+  File "renpy/common/000statements.rpy", line 453, in execute_pause
+    renpy.pause(delay)
+  File "renpy/common/00action_menu.rpy", line 220, in __call__
+    layout.yesno_screen(layout.QUIT, Quit(False))
+  File "renpy/common/00layout.rpy", line 527, in yesno_screen
+    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
+  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
+    rv = layout.yesno_prompt(*args)
+AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/CardGames/Els/scripts_els.rpy", line 37, in script
-    call screen els
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2015, in execute
+  File "game/CardGames/Witch/scripts_witch.rpy", line 23, in script
+    pause 3.0
+  File "renpy/ast.py", line 2015, in execute
     self.call("execute")
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2003, in call
+  File "renpy/ast.py", line 2003, in call
     return renpy.statements.call(method, parsed, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/statements.py", line 278, in call
+  File "renpy/statements.py", line 278, in call
     return method(parsed, *args, **kwargs)
-  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/exports.py", line 3136, in call_screen
-    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ui.py", line 298, in interact
+  File "renpy/common/000statements.rpy", line 453, in execute_pause
+    renpy.pause(delay)
+  File "renpy/exports.py", line 1563, in pause
+    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay)
+  File "renpy/ui.py", line 298, in interact
     rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 3325, in interact
+  File "renpy/display/core.py", line 3325, in interact
     repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 4160, in interact_core
-    rv = root_widget.event(ev, x, y, 0)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/screen.py", line 727, in event
-    rv = self.child.event(ev, x, y, st)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1323, in event
-    rv = super(Window, self).event(ev, x, y, st)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 273, in event
-    rv = d.event(ev, x - xo, y - yo, st)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1323, in event
-    rv = super(Window, self).event(ev, x, y, st)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 273, in event
-    rv = d.event(ev, x - xo, y - yo, st)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/layout.py", line 1102, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 983, in event
-    return handle_click(self.clicked)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 918, in handle_click
-    rv = run(action)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 323, in run
-    new_rv = run(i, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 330, in run
+  File "renpy/display/core.py", line 4035, in interact_core
+    self.quit_event()
+  File "renpy/display/core.py", line 2977, in quit_event
+    renpy.display.behavior.run(renpy.config.quit_action)
+  File "renpy/display/behavior.py", line 330, in run
     return action(*args, **kwargs)
-  File "renpy/common/00action_other.rpy", line 537, in __call__
-    rv = self.callable(*self.args, **self.kwargs)
-  File "game/CardGames/Els/py_els.rpy", line 115, in els_opponent_take_from_user
-    take_card_anim(from_side=0, to_side=1, index=selected_exchange_card_index_player)
-  File "game/CardGames/py.rpy", line 247, in take_card_anim
-    donor = card_game.players[from_side]
-AttributeError: ElsGame instance has no attribute 'players'
+  File "renpy/common/00action_menu.rpy", line 220, in __call__
+    layout.yesno_screen(layout.QUIT, Quit(False))
+  File "renpy/common/00layout.rpy", line 527, in yesno_screen
+    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
+  File "renpy/game.py", line 284, in invoke_in_new_context
+    return callable(*args, **kwargs)
+  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
+    rv = layout.yesno_prompt(*args)
+AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 
-Darwin-24.6.0-x86_64-i386-64bit
+Windows-10-10.0.26100
 Ren'Py 7.4.11.2266
  
-Thu Sep 25 14:00:05 2025
+Thu Sep 25 17:54:41 2025

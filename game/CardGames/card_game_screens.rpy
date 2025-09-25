@@ -147,7 +147,7 @@ screen game_phase_and_controls():
                         text_size 18
                         action [SetVariable("confirm_attack", True), Function(confirm_selected_attack)]
 
-        elif isinstance(card_game, WitchGame) and card_game.state == "wait_choice":
+        elif isinstance(card_game, WitchGame) and card_game.state == "wait_choice" and selected_exchange_card_index_opponent != -1:
                 frame:
                     xsize 150
                     padding (0, 0)
@@ -156,7 +156,7 @@ screen game_phase_and_controls():
                     textbutton "{color=#fff}Подтвердить{/color}":
                         style "card_game_button"
                         text_size 18
-                        action [Function(witch_user_take_from_ai_anim, selected_exchange_card_index_opponent), SetVariable("selected_exchange_card_index_opponent", -1), SetVariable("hovered_card_index_exchange", -1)]
+                        action Function(witch_player_turn)
 
         elif isinstance(card_game, ElsGame):
             if card_game.round < 5:

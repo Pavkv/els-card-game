@@ -101,12 +101,28 @@ init python:
     # ----------------------------
     # Position Helpers
     # ----------------------------
-    def hand_card_pos(side_index, card):
+    def diff_removed(before, after):
+        """Return list of (index, card) tuples for removed cards."""
+        removed = []
+        after_set = set(after)
+        for i, c in enumerate(before):
+            if c not in after_set:
+                removed.append((i, c))
+        return removed
+
+    def hand_card_pos(side_index, card, override_index=None):
         """Return the layout position (x, y) of the given card in hand layout."""
         layout = player_card_layout if side_index == 0 else opponent_card_layout
         hand = card_game.player.hand if side_index == 0 else card_game.opponent.hand
 
-        idx = hand.index(card)
+        if override_index is not None:
+            idx = override_index
+        else:
+            try:
+                idx = hand.index(card)
+            except ValueError:
+                idx = 0  # fallback index
+
         return layout[idx]["x"], layout[idx]["y"]
 
     def next_slot_pos(side_index):
@@ -115,20 +131,8 @@ init python:
         idx = len(hand)
         return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
 
-    def diff_removed(before, after):
-        """Cards removed from 'before' (order preserved)."""
-        removed = []
-        after_set = set(after)
-        for c in before:
-            if c not in after_set:
-                removed.append(c)
-        return removed
-
     def show_anim():
         renpy.show_screen("table_card_animation")
-
-    def bias_for(side_index):
-        return card_game.bias["player"] if side_index == 0 else card_game.bias["opponent"]
 
     # ----------------------------
     # Game Start Function
@@ -192,7 +196,7 @@ init python:
         d = 0.0
         table_animations[:] = []
 
-        player = card_game.players[side]
+        player = card_game.player if side == 0 else card_game.opponent
         bias_key = "player" if side == 0 else "opponent"
         target = "hand{}".format(side)
 
@@ -203,7 +207,6 @@ init python:
                 card_game.deck,
                 target_count,
                 sort_hand=False,
-                trump_suit=None,
                 good_prob=card_game.bias[bias_key]
             )
 
@@ -221,7 +224,7 @@ init python:
             d += step_delay
 
         if table_animations:
-            _show_anim()
+            show_anim()
 
         compute_hand_layout()
 
@@ -230,8 +233,7 @@ init python:
         to_side,
         index,
         base_delay=0.1,
-        duration=0.4,
-        override_img=None,
+        duration=0.4
     ):
         """
         Animate a card being taken from one player to another.
@@ -244,8 +246,8 @@ init python:
             duration (float): animation duration
             override_img (str or None): override image for animation (e.g. face-down card)
         """
-        donor = card_game.players[from_side]
-        taker = card_game.players[to_side]
+        donor = card_game.player if from_side == 0 else card_game.opponent
+        taker = card_game.player if to_side == 0 else card_game.opponent
 
         # Get card and its visual source position
         src_card = donor.hand[index] if index < len(donor.hand) else donor.hand[-1]
@@ -262,9 +264,8 @@ init python:
         taker.hand.remove(taken)
         compute_hand_layout()
 
-        # Determine animation image
-        if override_img is None:
-            override_img = get_card_image(taken) if to_side == 1 else base_cover_img_src
+        # Use appropriate image for animation
+        override_img = get_card_image(taken) if to_side == 1 else base_cover_img_src
 
         table_animations[:] = [{
             "card": taken,
@@ -306,6 +307,14 @@ init python:
         s.player_card_layout = []
         s.opponent_card_layout = []
         s.biased_draw = None
+        s.hovered_card_index_exchange = -1
+        s.selected_exchange_card_index = -1
+
+        # els-specific
+        s.result_combination_player = None
+        s.result_combination_indexes_player = set()
+        s.result_combination_opponent = None
+        s.result_combination_indexes_opponent = set()
 
         # durak-specific
         s.selected_card = None
@@ -321,11 +330,4 @@ init python:
         s.g21_aces_low = False
 
         # witch-specific
-        s.hovered_card_index_exchange = -1
-        s.selected_exchange_card_index = -1
-
-        # els-specific
-        s.result_combination_player = None
-        s.result_combination_indexes_player = set()
-        s.result_combination_opponent = None
-        s.result_combination_indexes_opponent = set()
+        s.made_turn = False
