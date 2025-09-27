@@ -40,7 +40,7 @@ screen card_game_base_ui():
         use player_card_hand_display()
 
     # Auto-jump after results
-    if card_game.state == "results" or card_game.result:
+    if card_game.state == "result" or card_game.result:
         timer 0.5 action Jump(card_game_name + "_game_loop")
 
 screen opponent_info_block():
@@ -232,12 +232,12 @@ screen discard_pile_display():
 
 screen opponent_card_hand_display():
 
-    if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.state == "results"):
+    if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.state == "result"):
 
         if isinstance(card_game, Game21):
             $ opponent_total = card_game.opponent.total21()
             $ opponent_hand_text = "Цена: " + (
-                str(opponent_total) if card_game.state in ("reveal", "results")
+                str(opponent_total) if card_game.state in ("reveal", "result")
                 else "#" if opponent_total < 10
                 else "##"
             )
@@ -263,7 +263,7 @@ screen opponent_card_hand_display():
 
             $ x_shift = 20 if i == hovered_card_index_exchange + 1 else (-20 if i == hovered_card_index_exchange - 1 else 0)
 
-            if isinstance(card_game, ElsGame) and card_game.state == "results":
+            if isinstance(card_game, ElsGame) and card_game.state == "result":
                 $ is_selected = (i in result_combination_indexes_opponent)
                 $ y_shift = 80 if is_hovered or is_selected else 0
                 imagebutton:
@@ -273,7 +273,7 @@ screen opponent_card_hand_display():
                     ypos card_y
                     at hover_offset(y=y_shift, x=x_shift)
 
-            elif isinstance(card_game, Game21) or isinstance(card_game, WitchGame) and card_game.state == "result" or card_game.result:
+            elif (isinstance(card_game, Game21) or isinstance(card_game, WitchGame)) and card_game.state == "result" or card_game.result:
                 add Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT)):
                     xpos card_x
                     ypos card_y
@@ -302,7 +302,7 @@ screen opponent_card_hand_display():
 
 screen player_card_hand_display():
 
-    if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.state == "results"):
+    if isinstance(card_game, Game21) or (isinstance(card_game, ElsGame) and card_game.state == "result"):
 
         if isinstance(card_game, Game21):
             $ player_hand_text = "Цена: " + str(card_game.player.total21())
@@ -326,7 +326,7 @@ screen player_card_hand_display():
             $ is_adjacent = abs(i - hovered_card_index) == 1
             $ x_shift = 20 if i == hovered_card_index + 1 else (-20 if i == hovered_card_index - 1 else 0)
 
-            if isinstance(card_game, ElsGame) and card_game.state == "results":
+            if isinstance(card_game, ElsGame) and card_game.state == "result":
                 $ is_selected = (i in result_combination_indexes_player)
                 $ y_shift = -80 if is_hovered or is_selected else 0
                 imagebutton:

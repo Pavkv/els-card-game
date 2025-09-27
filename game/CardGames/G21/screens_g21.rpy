@@ -19,11 +19,7 @@ screen game21():
                 textbutton "{color=#fff}Взять{/color}":
                     style "card_game_button"
                     text_size 25
-                    action [
-                        Function(player_hit),
-                        Function(compute_hand_layout),
-                        Jump(card_game_name + "_game_loop")
-                    ]
+                    action Function(g21_player_hit)
 
             frame:
                 xsize 150
@@ -33,7 +29,4 @@ screen game21():
                 textbutton "{color=#fff}Пас{/color}":
                     style "card_game_button"
                     text_size 25
-                    action [
-                        Function(player_pass),
-                        Jump(card_game_name + "_game_loop")
-                    ]
+                    action Function(g21_player_pass)

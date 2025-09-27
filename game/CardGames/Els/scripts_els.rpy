@@ -20,7 +20,7 @@ label els_game_loop:
 #         $ renpy.block_rollback()
         $ game_result_els()
 
-    if card_game.state == "results":
+    if card_game.state == "result":
 #       $ renpy.block_rollback()
         "[card_game.result]"
         pause 3.0

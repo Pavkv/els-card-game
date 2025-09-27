@@ -137,7 +137,7 @@ init python:
     # ----------------------------
     # Game Start Function
     # ----------------------------
-    def start_card_game(game_class, game_name, num_of_cards=6, sort_hand=False):
+    def start_card_game(game_class, game_name, num_of_cards=6, sort_hand=False, game_args=(), game_kwargs={}):
         """
         Initializes any card game with dealing animation setup.
 
@@ -153,7 +153,7 @@ init python:
         global base_cover_img_src, base_card_img_src, card_game_avatar
         global dealt_cards, is_dealing, deal_cards
 
-        card_game = game_class(player_name, opponent_name, biased_draw)
+        card_game = game_class(player_name, opponent_name, biased_draw, *game_args, **game_kwargs)
         card_game_name = game_name
         base_cover_img_src = base_card_img_src + "/cover.png"
         card_game.opponent.avatar = card_game_avatar
@@ -211,6 +211,9 @@ init python:
             )
 
             card = player.hand[-1]
+
+            override_img = get_card_image(card) if side == 0 else base_cover_img_src
+
             table_animations.append({
                 "card": card,
                 "src_x": DECK_X,
@@ -219,6 +222,7 @@ init python:
                 "dest_y": dest_y,
                 "delay": d,
                 "target": target,
+                "override_img": override_img,
             })
 
             d += step_delay

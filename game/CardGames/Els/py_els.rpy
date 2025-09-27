@@ -170,4 +170,4 @@ init python:
         renpy.pause(1.0)
 
         # Set game state
-        card_game.state = "results"
+        card_game.state = "result"

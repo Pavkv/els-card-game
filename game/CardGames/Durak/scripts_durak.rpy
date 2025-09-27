@@ -44,7 +44,7 @@ label durak_game_loop:
     if card_game.result:
 #         $ renpy.block_rollback()
         $ print("Game Over: ", card_game.result)
-        $ card_game.state = "results"
+        $ card_game.state = "result"
 
     if card_game.state == "ai_attack":
 #         $ renpy.block_rollback()
@@ -147,7 +147,7 @@ label durak_game_loop:
         $ print("Opponent hand after ending turn: ", card_game.opponent.hand)
 
         if card_game.result:
-            $ card_game.state = "results"
+            $ card_game.state = "result"
         else:
             $ old_player_len = len(card_game.player.hand)
             $ old_opponent_len = len(card_game.opponent.hand)
@@ -164,7 +164,7 @@ label durak_game_loop:
             $ next_turn = True
             $ confirm_take = False
 
-    if card_game.state == "results":
+    if card_game.state == "result":
 #       $ renpy.block_rollback()
         hide screen card_game_base_ui
         if in_game:

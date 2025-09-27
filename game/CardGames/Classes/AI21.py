@@ -1,7 +1,11 @@
-from CardGames.Classes.Card import Card
-from CardGames.Classes.Player import Player
+# coding=utf-8
+from game.CardGames.Classes.Card import Card
+from game.CardGames.Classes.Player import Player
 
 class AI21(Player):
+    def __init__(self, name):
+        super(AI21, self).__init__(name)
+
     _THRESHOLDS = {
         'weak':   0.50,
         'medium': 0.40,
@@ -9,53 +13,62 @@ class AI21(Player):
     }
 
     def _opponent_category(self, opponent_total):
+        """Classify opponent hand strength based on total."""
         if opponent_total is None:
             return 'medium'
         if opponent_total > 21 or opponent_total <= 13:
             return 'weak'
         if 14 <= opponent_total <= 17:
             return 'medium'
-        # 18–21
         return 'strong'
 
-    def _build_remopponentning_counts(self, seen_cards):
-        counts = dict((r, 4) for r in Card.ranks)
-        if seen_cards:
-            for c in seen_cards:
-                if c and c.rank in counts and counts[c.rank] > 0:
-                    counts[c.rank] -= 1
+    def _build_remaining_counts(self, seen_cards):
+        """Track remaining cards in the deck after removing seen ones."""
+        counts = {r: 4 for r in Card.ranks}
+        for card in seen_cards or []:
+            if card and card.rank in counts and counts[card.rank] > 0:
+                counts[card.rank] -= 1
         return counts
 
     def _safe_and_improving_stats(self, current_total, counts):
-        safe_cnt = 0
-        improving_cnt = 0
-        total_cnt = 0
+        """
+        Count:
+        - safe draws (won't bust)
+        - improving draws (bring total to 18–21)
+        """
+        safe, improve, total = 0, 0, 0
+
         for r in Card.ranks:
-            cnt = counts.get(r, 0)
-            if cnt <= 0:
+            count = counts.get(r, 0)
+            if count <= 0:
                 continue
+
             pts = Card.points21_map[r]
-            total_cnt += cnt
             new_total = current_total + pts
+            total += count
+
             if new_total <= 21:
-                safe_cnt += cnt
+                safe += count
                 if 18 <= new_total <= 21:
-                    improving_cnt += cnt
-        return safe_cnt, total_cnt, improving_cnt
+                    improve += count
 
-    def _adjust_threshold_for_context(self, base_threshold, total, opponent_total):
-        th = base_threshold
+        return safe, total, improve
 
-        # Hand-shape nudges
+    def _adjust_threshold(self, base, total, opponent_total):
+        """Tweak base threshold based on current and opponent hands."""
+        th = base
+
+        # Adjust for AI's own hand shape
         if total in (10, 11):
             th -= 0.05
-        if total == 14:
+        elif total == 14:
             th += 0.02
-        if total == 15:
+        elif total == 15:
             th += 0.05
-        if total == 16:
+        elif total == 16:
             th += 0.10
 
+        # Adjust for opponent hand
         if opponent_total is not None:
             if opponent_total > 21:
                 th += 0.08
@@ -64,15 +77,15 @@ class AI21(Player):
             elif opponent_total <= 13:
                 th += 0.05
 
-        # Clip
-        if th < 0.0: th = 0.0
-        if th > 0.95: th = 0.95
-        return th
+        return min(max(th, 0.0), 0.95)
 
     def decide(self, seen_cards=None, opponent_total=None):
+        """
+        Decide whether to 'h' (hit) or 'p' (pass) based on hand and probabilities.
+        """
         total = self.total21()
 
-        # Hard edges
+        # Forced decisions
         if total >= 21:
             return 'p'
         if total <= 9:
@@ -80,22 +93,22 @@ class AI21(Player):
         if total >= 17:
             return 'p'
 
-        if seen_cards is None:
-            seen_cards = list(self.hand)
+        seen_cards = seen_cards or list(self.hand)
+        counts = self._build_remaining_counts(seen_cards)
+        safe_cnt, total_cnt, improve_cnt = self._safe_and_improving_stats(total, counts)
 
-        counts = self._build_remopponentning_counts(seen_cards)
-        safe_cnt, total_cnt, improving_cnt = self._safe_and_improving_stats(total, counts)
-        safe_prob = (float(safe_cnt) / float(total_cnt)) if total_cnt else 0.0
+        safe_prob = float(safe_cnt) / total_cnt if total_cnt else 0.0
+        improve_prob = float(improve_cnt) / total_cnt if total_cnt else 0.0
 
+        # Threshold based on opponent strength
         opp_cat = self._opponent_category(opponent_total)
-        base = self._THRESHOLDS[opp_cat]
-        threshold = self._adjust_threshold_for_context(base, total, opponent_total)
+        base_threshold = self._THRESHOLDS[opp_cat]
+        threshold = self._adjust_threshold(base_threshold, total, opponent_total)
 
-        if total_cnt > 0:
-            improve_prob = float(improving_cnt) / float(total_cnt)
-            if improve_prob < 0.12:
-                threshold += 0.02
-            elif improve_prob > 0.30:
-                threshold -= 0.02
+        # Fine-tune based on how many cards improve our hand
+        if improve_prob < 0.12:
+            threshold += 0.02
+        elif improve_prob > 0.30:
+            threshold -= 0.02
 
         return 'h' if safe_prob >= threshold else 'p'
