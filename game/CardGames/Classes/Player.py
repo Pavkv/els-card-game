@@ -23,8 +23,13 @@ class Player(object):
             self.sort_hand(deck.trump_suit)
 
     def sort_hand(self, trump_suit):
+        """
+        Sort the hand:
+        - Non-trump cards first by ascending rank
+        - Trump cards after, also ascending rank
+        """
         def card_sort_key(card):
-            is_trump = (card.suit == trump_suit)
+            is_trump = card.suit == trump_suit  # False for non-trumps, True for trumps
             rank_value = Card.rank_values[card.rank]
             return is_trump, rank_value
 

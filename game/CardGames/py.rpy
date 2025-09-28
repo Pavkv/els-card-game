@@ -2,7 +2,7 @@ init python:
     import random
 
     from CardGames.Classes.Card import Card
-    from CardGames.Durak.DurakCardGame import DurakCardGame
+    from CardGames.Durak.DurakGame import DurakGame
     from CardGames.G21.Game21 import Game21
     from CardGames.Witch.WitchGame import WitchGame
     from game.CardGames.Els.ElsGame import ElsGame
@@ -92,8 +92,8 @@ init python:
         return False
 
     def handle_card_action(card_game, index):
-        if isinstance(card_game, DurakCardGame):
-            return Function(handle_card_click, index)
+        if isinstance(card_game, DurakGame):
+            return Function(durak_handle_card_click, index)
         elif isinstance(card_game, ElsGame) and card_game.state == "player_defend":
             return Function(lambda: els_swap_cards_player(index))
         return Return()
@@ -137,7 +137,7 @@ init python:
     # ----------------------------
     # Game Start Function
     # ----------------------------
-    def start_card_game(game_class, game_name, num_of_cards=6, sort_hand=False, game_args=(), game_kwargs={}):
+    def start_card_game(game_class, game_name, num_of_cards=6, game_args=(), game_kwargs={}):
         """
         Initializes any card game with dealing animation setup.
 
@@ -158,7 +158,7 @@ init python:
         base_cover_img_src = base_card_img_src + "/cover.png"
         card_game.opponent.avatar = card_game_avatar
 
-        card_game.start_game(num_of_cards, sort_hand)
+        card_game.start_game(num_of_cards)
         compute_hand_layout()
 
         dealt_cards = []
@@ -183,6 +183,7 @@ init python:
             delay += 0.1
 
         renpy.show_screen("card_game_base_ui")
+
         renpy.jump(game_name + "_game_loop")
 
     # ----------------------------

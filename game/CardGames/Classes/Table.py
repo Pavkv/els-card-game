@@ -1,9 +1,9 @@
+from collections import OrderedDict
 from Card import Card
-
 
 class Table:
     def __init__(self):
-        self.table = {}  # {attack_card: [is_beaten: bool, defending_card: Card or None]}
+        self.table = OrderedDict()  # {attack_card: [is_beaten: bool, defending_card: Card or None]}
         self.ranks = set()
 
     def __str__(self):
@@ -19,10 +19,9 @@ class Table:
         return self.table.keys()
 
     def values(self):
-        return [status[1] for status in self.table.items()]
+        return [v[1] for v in self.table.values()]
 
     def append(self, card):
-        # Only allow same ranks already on table (after first)
         if self.table and card.rank not in self.ranks:
             return False
         self.table[card] = [False, None]
@@ -38,10 +37,9 @@ class Table:
         for attack_card, (is_beaten, _) in self.table.items():
             if is_beaten:
                 continue
-            # If at least one card in hand can beat this attack_card
             if not any(Card.beats(def_card, attack_card, trump_suit) for def_card in defender_hand):
-                return False  # Can't beat this one
-        return True  # All attack cards can be beaten
+                return False
+        return True
 
     def num_beaten(self):
         return sum(1 for status in self.table.values() if status[0])
@@ -50,9 +48,8 @@ class Table:
         return sum(1 for status in self.table.values() if not status[0])
 
     def beaten(self):
-        return all(status[0] for status in self.table.values())
+        return all(status[0] for status in self.table.values()) if self.table else False
 
     def clear(self):
         self.table.clear()
         self.ranks.clear()
-

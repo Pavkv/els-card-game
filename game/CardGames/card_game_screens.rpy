@@ -112,9 +112,9 @@ screen game_phase_and_controls():
                 text_align 0.5
                 align (0.5, 0.5)
 
-        if isinstance(card_game, DurakCardGame):
-            $ show_end_turn = card_game.table and card_game.state in ["player_attack", "player_defend"]
-            $ show_confirm_attack = card_game.state == "player_attack" and len(selected_attack_card_indexes) > 0
+        if isinstance(card_game, DurakGame):
+            $ show_end_turn = card_game.table and card_game.state in ["player_turn", "player_defend"]
+            $ show_confirm_attack = card_game.state == "player_turn" and len(selected_attack_card_indexes) > 0
             if show_end_turn and show_confirm_attack:
                 $ y1 = 30
                 $ y2 = 40
@@ -127,13 +127,13 @@ screen game_phase_and_controls():
                     padding (0, 0)
                     ypos y1
                     has vbox
-                    textbutton ["{color=#fff}Бито{/color}" if card_game.state == "player_attack" else "{color=#fff}Взять{/color}"]:
+                    textbutton ["{color=#fff}Бито{/color}" if card_game.state == "player_turn" else "{color=#fff}Взять{/color}"]:
                         style "card_game_button"
                         text_size 25
                         action [If(
-                            card_game.state == "player_attack",
+                            card_game.state == "player_turn",
                             [SetVariable("card_game.state", "end_turn"), SetVariable("selected_attack_card_indexes", set())],
-                            SetVariable("card_game.state", "ai_attack")
+                            SetVariable("card_game.state", "opponent_turn")
                         ), SetVariable("confirm_take", True)]
 
             if show_confirm_attack:
@@ -145,7 +145,7 @@ screen game_phase_and_controls():
                     textbutton "{color=#fff}Подтвердить\nатаку{/color}":
                         style "card_game_button"
                         text_size 18
-                        action [SetVariable("confirm_attack", True), Function(confirm_selected_attack)]
+                        action [SetVariable("confirm_attack", True), Function(durak_confirm_selected_attack)]
 
         elif isinstance(card_game, WitchGame) and card_game.state == "wait_choice" and selected_exchange_card_index_opponent != -1:
                 frame:
@@ -198,7 +198,7 @@ screen trump_and_deck_display():
 
     if card_game.deck.cards:
 
-        if isinstance(card_game, DurakCardGame):
+        if isinstance(card_game, DurakGame):
 
             $ trump = card_game.deck.trump_card
             if trump:
@@ -215,7 +215,7 @@ screen trump_and_deck_display():
             ypos 455
             size 60
 
-    elif isinstance(card_game, DurakCardGame) and not card_game.deck.cards:
+    elif isinstance(card_game, DurakGame) and not card_game.deck.cards:
             text card_suits[card_game.deck.trump_suit]:
                 xpos deck_xpos
                 ypos 455
@@ -337,7 +337,7 @@ screen player_card_hand_display():
                     at hover_offset(y=y_shift, x=x_shift)
 
             else:
-                $ is_selected = (i in [selected_attack_card_indexes, selected_exchange_card_index_player])
+                $ is_selected = (i in selected_attack_card_indexes or i == selected_exchange_card_index_player)
                 $ y_shift = -80 if is_hovered or is_selected else 0
                 imagebutton:
                     idle Transform(get_card_image(card), xysize=(CARD_WIDTH, CARD_HEIGHT))

@@ -67,10 +67,10 @@ init:
             "results": "Игра окончена"
         },
         "durak" : {
-            "player_attack": "Вы атакуете",
+            "player_turn": "Вы атакуете",
             "player_defend": "Вы защищаетесь",
-            "ai_attack": "Противник атакует",
-            "ai_defend": "Противник защищается",
+            "opponent_turn": "Противник атакует",
+            "opponent_defend": "Противник защищается",
             "end_turn": "Окончание хода",
             "results": "Игра окончена"
         },

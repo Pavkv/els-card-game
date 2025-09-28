@@ -26,3 +26,4 @@ class CardGame:
         self.opponent.draw_from_deck(self.deck, n, sort_hand, self.bias["opponent"])
         self.first_player = random.choice([self.player, self.opponent])
         self.state = "player_turn" if self.first_player == self.player else "opponent_turn"
+        self.current_turn = self.first_player

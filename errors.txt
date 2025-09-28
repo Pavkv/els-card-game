@@ -2,10 +2,7 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/py.rpy", line 124: invalid syntax
-                print(f"Card {card} not found in hand during hand_card_pos.")
-                                                                            ^
-    
+File "game/CardGames/Durak/py_durak.rpy", line 95: indentation mismatch.
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Thu Sep 25 15:56:58 2025
+Sat Sep 27 21:21:09 2025
