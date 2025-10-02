@@ -2,7 +2,10 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/Durak/py_durak.rpy", line 95: indentation mismatch.
+File "game/CardGames/py.rpy", line 203: invalid syntax
+        target = f"hand{side}"
+                              ^
+    
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Sat Sep 27 21:21:09 2025
+Tue Sep 30 15:15:44 2025

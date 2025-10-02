@@ -14,8 +14,8 @@ init:
     default made_turn = False
 
     # Layout constants
-    default DECK_X = 50
-    default DECK_Y = 350
+    default DECK_X = 13
+    default DECK_Y = 373
     default DISCARD_X = 1600
     default DISCARD_Y = 350
     default HAND0_X = 700
@@ -100,8 +100,8 @@ init:
 
     transform deal_card(dest_x, dest_y, delay=0):
         alpha 0.0
-        xpos -50
-        ypos 350
+        xpos DECK_X
+        ypos DECK_Y
         pause delay
         linear 0.3 alpha 1.0 xpos dest_x ypos dest_y
 

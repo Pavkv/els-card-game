@@ -21,8 +21,11 @@ class Table:
     def values(self):
         return [v[1] for v in self.table.values()]
 
+    def can_append(self, card):
+        return not self.table or card.rank in self.ranks
+
     def append(self, card):
-        if self.table and card.rank not in self.ranks:
+        if not self.can_append(card):
             return False
         self.table[card] = [False, None]
         self.ranks.add(card.rank)
@@ -46,6 +49,12 @@ class Table:
 
     def num_unbeaten(self):
         return sum(1 for status in self.table.values() if not status[0])
+
+    def first_unbeaten(self):
+        for (i, attack_card, (is_beaten, _)) in enumerate(self.table.items()):
+            if not is_beaten:
+                return i, attack_card
+        return None, None
 
     def beaten(self):
         return all(status[0] for status in self.table.values()) if self.table else False

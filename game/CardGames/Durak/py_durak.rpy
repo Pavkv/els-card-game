@@ -2,44 +2,49 @@ init python:
      # --------------------
      # Durak Animations
      # --------------------
-    def animate_table_cards(card_game, step_delay=0.2):
+    def animate_and_resolve_table(step_delay=0.1, anim_duration=0.25):
+        global hovered_card_index
         """
-        Animate cards being cleared from the table.
-        If the table is NOT beaten, cards go to the receiving player's hand.
-        If beaten, all cards go to the discard pile.
+        Animate cards being cleared from the table and defer logic until after animation.
         """
+
         table_animations[:] = []
         delay = 0.0
 
         is_beaten = card_game.table.beaten()
+
         receiver = (
             card_game.player
             if card_game.current_turn != card_game.player
             else card_game.opponent
         )
 
-        for i, (atk, (beaten, def_card)) in enumerate(card_game.table.table.items()):
+        for i, (atk_card, (beaten, def_card)) in enumerate(card_game.table.table.items()):
             src_x = 350 + i * 200
             src_y = 375
-            cards = list(filter(None, [atk, def_card]))
+            cards = list(filter(None, [atk_card, def_card]))
 
             for card in cards:
+                offset_x = 30 * i
+                offset_y = 0
+
                 anim = {
                     "card": card,
                     "src_x": src_x,
-                    "src_y": src_y if card == atk else src_y + 120,
+                    "src_y": src_y if card == atk_card else src_y + 120,
                     "delay": delay,
+                    "duration": anim_duration,
                 }
 
                 if is_beaten:
                     anim.update({
-                        "dest_x": 1600,
-                        "dest_y": 350,
+                        "dest_x": 1600 + offset_x,
+                        "dest_y": 350 + offset_y,
                         "target": "discard",
                     })
                 else:
                     anim.update({
-                        "dest_x": 700,
+                        "dest_x": 700 + offset_x,
                         "dest_y": 825 if receiver == card_game.player else 20,
                         "target": "hand",
                     })
@@ -47,47 +52,122 @@ init python:
                 table_animations.append(anim)
                 delay += step_delay
 
-        if table_animations:
-            show_anim()
+        def resolve_table_logic():
+            if is_beaten:
+                for atk_card, (beaten, def_card) in card_game.table.table.items():
+                    card_game.deck.discard.append(atk_card)
+                    if def_card:
+                        card_game.deck.discard.append(def_card)
+                card_game.current_turn = (
+                    card_game.opponent if card_game.current_turn == card_game.player else card_game.player
+                )
+                card_game.state = (
+                    "player_turn" if card_game.current_turn == card_game.player else "opponent_turn"
+                )
+            else:
+                for atk_card, (beaten, def_card) in card_game.table.table.items():
+                    receiver.hand.append(atk_card)
+                    if def_card:
+                        receiver.hand.append(def_card)
+                card_game.state = (
+                    "player_turn" if receiver == card_game.opponent else "opponent_turn"
+                )
 
-    def play_card_anim(card, side, slot_index=0, is_defense=False, delay=0.0):
+            card_game.table.clear()
+
+            print("Discard pile:", card_game.deck.discard)
+            print("Player hand after turn:", card_game.player.hand)
+            print("Opponent hand after turn:", card_game.opponent.hand)
+
+            if card_game.current_turn == card_game.opponent:
+                draw_anim(side=0, sort_hand=True, on_finish=lambda: draw_anim(side=1, sort_hand=True))
+            else:
+                draw_anim(side=1, sort_hand=True, on_finish=lambda: draw_anim(side=0, sort_hand=True))
+
+            card_game.player.sort_hand(card_game.deck.trump_suit)
+            card_game.opponent.sort_hand(card_game.deck.trump_suit)
+
+            compute_hand_layout()
+
+        show_anim(function=resolve_table_logic)
+
+        hovered_card_index = -1
+
+    def play_card_anim(cards, side, slot_index=0, is_defense=False, delay=0.5, anim_duration=0.5):
         """
-        Animate playing a card from the player's or opponent's hand onto the table.
+        Animate playing one or multiple cards from the player's or opponent's hand onto the table,
+        then update the table structure and remove cards from the hand.
 
         Arguments:
-        - card: the Card object to animate
+        - cards: list of Card objects to animate
         - side: 0 for player, 1 for opponent
         - slot_index: index on table (0 for first attack, 1 for next, etc.)
-        - is_defense: if True, card is placed below the attack card
-        - delay: optional delay before animation starts
+        - is_defense: if True, only one card should be used to defend at given slot
+        - delay: delay before first animation starts
+        - anim_duration: animation duration per card
         """
+        global hovered_card_index
+
+        if not cards:
+            print("No cards given for animation.")
+            return
+
         table_animations[:] = []
 
-        # Hand source position
-        src_x, src_y = hand_card_pos(side, card)
-
-        # Table destination position
+        player = card_game.player if side == 0 else card_game.opponent
         base_x = 350 + slot_index * 200
         base_y = 375
-        dest_x = base_x
-        dest_y = base_y + 120 if is_defense else base_y
 
-        # Choose card image override
-        override_img = get_card_image(card) if side == 0 else base_cover_img_src
+        def apply_card_moves():
+            attack_keys = list(card_game.table.table.keys())
+            for i, card in enumerate(cards):
+                if is_defense:
+                    if i == 0 and slot_index < len(attack_keys):
+                        atk_card = attack_keys[slot_index]
+                        if not card_game.table.table[atk_card][0]:
+                            card_game.table.beat(atk_card, card)
+                    else:
+                        print("Cannot defend with multiple cards or invalid slot.")
+                else:
+                    if not card_game.table.append(card):
+                        print("Invalid attack: card doesn't match table ranks.")
+                        continue
 
-        table_animations.append({
-            "card": card,
-            "src_x": src_x,
-            "src_y": src_y,
-            "dest_x": dest_x,
-            "dest_y": dest_y,
-            "delay": delay,
-            "target": "table",
-            "override_img": override_img,
-        })
+                if card in player.hand:
+                    player.hand.remove(card)
 
-        show_anim()
-        compute_hand_layout()
+            compute_hand_layout()
+
+        for i, card in enumerate(cards):
+            if card is None:
+                continue
+
+            # Skip invalid cards for attack
+            if not is_defense and not card_game.table.can_append(card):
+                print("Cannot append card to table:", card)
+                continue
+
+            src_x, src_y = hand_card_pos(side, card)
+            dest_x = base_x + i * 40  # Offset for multi-card visual spacing
+            dest_y = base_y + 120 if is_defense else base_y
+
+            override_img = get_card_image(card) if side == 0 else base_cover_img_src
+
+            table_animations.append({
+                "card": card,
+                "src_x": src_x,
+                "src_y": src_y,
+                "dest_x": dest_x,
+                "dest_y": dest_y,
+                "delay": delay + i * 0.2,
+                "duration": anim_duration,
+                "target": "table",
+                "override_img": override_img,
+            })
+
+        show_anim(apply_card_moves)
+
+        hovered_card_index = -1
 
     # --------------------
     # Player Functions
@@ -123,13 +203,11 @@ init python:
                 attack_slot_index = next((i for i, (atk, _) in enumerate(card_game.table.table.items()) if atk == selected_attack_card), table_size - 1)
 
                 play_card_anim(
-                    card=card,
+                    cards=[card],
                     side=0,
                     slot_index=attack_slot_index,
                     is_defense=True,
-                    delay=0.0
                 )
-                show_anim()
 
                 selected_attack_card = None
                 card_game.state = "opponent_turn"
@@ -145,21 +223,17 @@ init python:
             indexes = sorted(selected_attack_card_indexes)
             cards = [card_game.player.hand[i] for i in indexes]
 
-            if card_game.attack_cards(cards):
+            if card_game.can_attack(card_game.player):
                 print("Player attacked with: " + ', '.join(str(c) for c in cards))
 
                 # Animate each card moving to table
-                table_animations[:] = []
-                for i, card in enumerate(cards):
-                    play_card_anim(
-                        card=card,
-                        side=0,
-                        slot_index=len(card_game.table) - len(cards) + i,
-                        is_defense=False,
-                        delay=i * 0.1
-                    )
-
-                show_anim()
+                start_index = len(card_game.table)
+                play_card_anim(
+                    cards=cards,
+                    side=0,
+                    slot_index=start_index,
+                    is_defense=False,
+                )
 
                 # Clear selection and proceed to opponent turn
                 selected_attack_card_indexes.clear()
@@ -179,32 +253,25 @@ init python:
         global confirm_take
 
         if card_game.can_attack(card_game.opponent):
-            attack_success = card_game.opponent_attack()
+            attack_success, cards = card_game.opponent_attack()
             if attack_success:
-                print("AI attacked successfully with:", list(card_game.table.table.keys()))
-                renpy.pause(1.5)
+                print("AI attacked successfully with:", cards)
+
+                start_index = len(card_game.table)
+                play_card_anim(
+                    cards=cards,
+                    side=1,
+                    slot_index=start_index,
+                    is_defense=False,
+                )
+
                 card_game.state = "player_defend"
-
-                table_size = len(card_game.table)
-                delay = 0.0
-                for i, (card, _) in enumerate(card_game.table.table.items()):
-                    play_card_anim(
-                        card=card,
-                        side=1,
-                        slot_index=i,
-                        is_defense=False,
-                        delay=delay
-                    )
-                    delay += 0.05
-
-                show_anim()
 
             else:
                 print("AI attempted to attack but failed unexpectedly.")
                 card_game.state = "end_turn"
 
         else:
-
             if not card_game.table.beaten() and not confirm_take:
                 print("AI skipped attack; player must still defend or take.")
                 card_game.state = "player_defend"
@@ -215,29 +282,56 @@ init python:
                 card_game.state = "end_turn"
 
     def durak_opponent_defend():
-        """Handles the opponent's defense logic against player attack."""
-        defend_success = card_game.opponent_defend()
+        """Handles the opponent's defense logic sequentially with animation."""
+        defense_queue = []
 
-        if defend_success:
-            print("AI defended successfully.")
-            # Animate defense (card placed on top of attack)
-            delay = 0.0
-            for i, (atk, (beaten, def_card)) in enumerate(card_game.table.table.items()):
-                if beaten and def_card:
-                    play_card_anim(
-                        card=def_card,
-                        side=1,  # opponent
-                        slot_index=i,
-                        is_defense=True,
-                        delay=delay
-                    )
-                    delay += 0.1
-            show_anim()
+        # Queue up all current defense moves
+        for i, (attack_card, (beaten, _)) in enumerate(card_game.table.table.items()):
+            if not beaten:
+                def_card = card_game.opponent.defense(attack_card, card_game.deck.trump_suit)
+                if def_card:
+                    defense_queue.append((i, attack_card, def_card))
+                else:
+                    print("AI cannot defend against:", attack_card)
+                    break  # Stop trying to defend
 
+        def do_defense(index=0):
+            if index >= len(defense_queue):
+                # All done — now check if fully defended
+                if card_game.table.beaten():
+                    print("AI defended all attacks.")
+                else:
+                    print("AI failed to defend completely.")
+                card_game.state = "player_turn"
+                return
+
+            slot_index, atk_card, def_card = defense_queue[index]
+
+            def apply_defense():
+                # Now it's safe to update the game state
+                card_game.table.beat(atk_card, def_card)
+                if def_card in card_game.opponent.hand:
+                    card_game.opponent.hand.remove(def_card)
+                compute_hand_layout()
+
+                # Move to next defense
+                do_defense(index + 1)
+
+            # Animate it
+            play_card_anim(
+                cards=[def_card],
+                side=1,
+                slot_index=slot_index,
+                is_defense=True,
+                delay=0.0
+            )
+            show_anim(apply_defense)  # ensure `beat()` happens *after* animation
+
+        if defense_queue:
+            do_defense()
         else:
-            print("AI could not defend. Player wins this round.")
-
-        card_game.state = "player_turn"
+            print("AI could not defend. Will need to take.")
+            card_game.state = "player_turn"
 
     # --------------------
     # End Turn Logic
@@ -248,14 +342,23 @@ init python:
         # AI Throw-ins if it was the AI's turn and player still can be attacked
         if card_game.current_turn == card_game.opponent and card_game.can_attack(card_game.opponent):
             print("AI adding throw-ins.")
-            card_game.throw_ins()
+            throw_ins = card_game.throw_ins()
+
+            table_animations[:] = []
+            for i, card in enumerate(throw_ins):
+                play_card_anim(
+                    card=card,
+                    side=1,
+                    slot_index=len(card_game.table) - len(cards) + i,
+                    is_defense=False,
+                    delay=i * 0.1
+                )
+
+            show_anim()
 
         print("Table before ending turn:", card_game.table)
         print("Player hand before ending turn:", card_game.player.hand)
         print("Opponent hand before ending turn:", card_game.opponent.hand)
-
-        # Animate cards moving off the table
-        animate_table_cards(card_game)
 
         # Check for special two sixes attack
         attack_cards = [atk for atk, (_b, _d) in card_game.table.table.items()]
@@ -273,27 +376,14 @@ init python:
             and card_game.deck.is_empty()
         )
 
-        # Clear table: either take or discard
-        card_game.take_or_discard_cards()
         card_game.opponent.remember_table(card_game.table)
         card_game.opponent.remember_discard(card_game.deck.discard)
 
-        # Clear table
-        card_game.table.clear()
-
-        # Draw cards to 6 for both players
-        draw_anim(0, 6 - len(card_game.player.hand))
-        draw_anim(1, 6 - len(card_game.opponent.hand))
+        # Animate and resolve the table
+        animate_and_resolve_table()
 
         # Check for game over conditions
         card_game.check_endgame()
-
-        # Set next state
-        card_game.state = "player_turn" if card_game.current_turn == card_game.player else "opponent_turn"
-
-        print("Discard pile:", card_game.deck.discard)
-        print("Player hand after turn:", card_game.player.hand)
-        print("Opponent hand after turn:", card_game.opponent.hand)
 
         # Check if game has ended
         if card_game.result:

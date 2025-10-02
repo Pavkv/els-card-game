@@ -131,8 +131,8 @@ init python:
         idx = len(hand)
         return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
 
-    def show_anim():
-        renpy.show_screen("table_card_animation")
+    def show_anim(function=None):
+        renpy.show_screen("table_card_animation", function=function)
 
     # ----------------------------
     # Game Start Function
@@ -189,29 +189,35 @@ init python:
     # ----------------------------
     # In Game Functions
     # ----------------------------
-    def draw_anim(side, target_count=6, step_delay=0.05):
+    def draw_anim(side, target_count=6, sort_hand=False, step_delay=0.1, on_finish=None):
         """
         Animate drawing cards for the given side (0 = player, 1 = opponent)
         until the hand has `target_count` cards or the deck is empty.
+
+        This version handles animation first, then updates the actual hand after animation.
         """
-        d = 0.0
         table_animations[:] = []
 
         player = card_game.player if side == 0 else card_game.opponent
         bias_key = "player" if side == 0 else "opponent"
         target = "hand{}".format(side)
 
-        while len(player.hand) < target_count and not card_game.deck.is_empty():
-            dest_x, dest_y = next_slot_pos(side)
+        # Precompute number of cards to draw
+        num_to_draw = min(target_count - len(player.hand), len(card_game.deck.cards))
+        anim_duration = 0.2
+        d = 0.1  # Initial delay
 
-            player.draw_from_deck(
-                card_game.deck,
-                target_count,
-                sort_hand=False,
+        # We store the cards to be drawn after animation
+        drawn_cards = []
+
+        for i in range(num_to_draw):
+            card = card_game.deck.draw_with_bias(
                 good_prob=card_game.bias[bias_key]
             )
 
-            card = player.hand[-1]
+            drawn_cards.append(card)
+
+            dest_x, dest_y = next_slot_pos(side)
 
             override_img = get_card_image(card) if side == 0 else base_cover_img_src
 
@@ -222,16 +228,23 @@ init python:
                 "dest_x": dest_x,
                 "dest_y": dest_y,
                 "delay": d,
+                "duration": anim_duration,
                 "target": target,
                 "override_img": override_img,
             })
 
             d += step_delay
 
-        if table_animations:
-            show_anim()
+        def apply_draw():
+            for card in drawn_cards:
+                player.hand.append(card)
+            if sort_hand:
+                player.sort_hand(card_game.deck.trump_suit)
+            compute_hand_layout()
+            if on_finish:
+                on_finish()
 
-        compute_hand_layout()
+        show_anim(function=apply_draw)
 
     def take_card_anim(
         from_side,
@@ -288,6 +301,7 @@ init python:
         # Return the card to taker's hand
         taker.hand.append(taken)
         compute_hand_layout()
+
 
     # ----------------------------
     # Reset Game Function

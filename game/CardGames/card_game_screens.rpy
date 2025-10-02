@@ -132,8 +132,12 @@ screen game_phase_and_controls():
                         text_size 25
                         action [If(
                             card_game.state == "player_turn",
-                            [SetVariable("card_game.state", "end_turn"), SetVariable("selected_attack_card_indexes", set())],
-                            SetVariable("card_game.state", "opponent_turn")
+                            [
+                            SetVariable("card_game.state", "end_turn"),
+                            SetVariable("selected_attack_card_indexes", set()),
+                            SetVariable("hovered_card_index", -1)
+                            ],
+                            SetVariable("card_game.state", "opponent_turn"),
                         ), SetVariable("confirm_take", True)]
 
             if show_confirm_attack:
@@ -397,7 +401,7 @@ screen draw_cards():
 
     timer delay + 1.0 action Jump(card_game_name + "_game_loop")
 
-screen table_card_animation():
+screen table_card_animation(function=None):
 
     default max_duration = 0.0
 
@@ -410,19 +414,28 @@ screen table_card_animation():
         $ delay = anim["delay"]
         $ duration = anim.get("duration", 0.4)
         $ is_discard = anim["target"] == "discard"
+        $ anim_time = delay + duration
 
+        # Track the card in flight
         $ in_flight_cards.add(card)
 
-        $ max_duration = max(max_duration, delay + duration)
+        # Update total max animation time
+        $ max_duration = max(max_duration, anim_time)
 
+        # Animated movement of the card
         add Transform(
             anim.get("override_img", get_card_image(card)),
             xysize=(CARD_WIDTH, CARD_HEIGHT)
         ) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, duration, is_discard)
 
+        # ⏱ Timer to remove the card after animation ends
+        timer anim_time action Function(in_flight_cards.discard, card)
+
+    # Final cleanup after all animations are done
     timer max_duration + 0.01 action [
         SetVariable("table_animations", []),
         SetVariable("in_flight_cards", set()),
         Function(renpy.restart_interaction),
         Hide("table_card_animation"),
+        Function(function) if function else None
     ]
