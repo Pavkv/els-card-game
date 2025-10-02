@@ -23,8 +23,8 @@ class Game21(CardGame):
             return True
         return False
 
-    def start_game(self, initial_deal=1, sort_hand=False):
-        CardGame.start_game(self, n=self.initial_deal, sort_hand=sort_hand)
+    def start_game(self, initial_deal=1, sort_hand=False, first_player_selection=False):
+        CardGame.start_game(self, n=self.initial_deal, sort_hand=sort_hand, first_player_selection=first_player_selection)
         self._instant_check()
 
     def opponent_turn(self):

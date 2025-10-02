@@ -18,7 +18,7 @@ class WitchGame(CardGame):
         self.opponent = AIWitch(opponent_name)
         self.user_turn = None
 
-    def start_game(self, n=6, sort_hand=False):
+    def start_game(self, n=6, sort_hand=False, first_player_selection=False):
         CardGame.start_game(self)
         if self.current_turn == self.player:
             self.player_turn_start()

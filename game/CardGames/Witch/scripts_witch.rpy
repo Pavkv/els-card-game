@@ -1,4 +1,4 @@
-label start:
+label start_witch:
     $ player_name = renpy.input("Введите ваше имя", length=20)
     $ opponent_name = "Противник"
     $ cards_bg = "images/bg/bg_14.jpg"
@@ -41,13 +41,6 @@ label witch_game_loop:
 #         $ renpy.block_rollback()
         pause 1.5
         $ witch_opponent_turn()
-
-    $ game_over = card_game.game_over()
-    if game_over[0]:
-#         $ renpy.block_rollback()
-        $ card_game.result = game_over[1]
-        $ print("Game Over: ", card_game.result)
-        $ card_game.state = "result"
 
     call screen witch
     jump witch_game_loop

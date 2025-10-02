@@ -2,10 +2,13 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/py.rpy", line 293: invalid syntax
-                "target": f"hand{to_side}",
-                                          ^
-    
+File "game/CardGames/Durak/scripts_durak.rpy", line 12: expected statement.
+    print(card_game.player.hand)
+                                ^
+
+File "game/CardGames/Durak/scripts_durak.rpy", line 13: expected statement.
+    print(card_game.opponent.hand)
+                                  ^
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Wed Oct  1 21:59:47 2025
+Thu Oct  2 13:21:11 2025

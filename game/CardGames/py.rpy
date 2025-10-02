@@ -131,8 +131,11 @@ init python:
         idx = len(hand)
         return (HAND0_X + idx * HAND_SPACING, HAND0_Y) if side_index == 0 else (HAND1_X + idx * HAND_SPACING, HAND1_Y)
 
-    def show_anim(function=None):
-        renpy.show_screen("table_card_animation", function=function)
+    def show_anim(function=None, delay=0.0):
+        renpy.show_screen("table_card_animation", function=function, delay=delay)
+
+    def delay_anim(delay=3, on_finish=None):
+        show_anim(function=on_finish, delay=delay)
 
     # ----------------------------
     # Game Start Function

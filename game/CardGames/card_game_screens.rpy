@@ -401,9 +401,9 @@ screen draw_cards():
 
     timer delay + 1.0 action Jump(card_game_name + "_game_loop")
 
-screen table_card_animation(function=None):
+screen table_card_animation(function=None, delay=0.0):
 
-    default max_duration = 0.0
+    default max_duration = delay
 
     for anim in table_animations:
         $ card = anim["card"]
@@ -416,22 +416,16 @@ screen table_card_animation(function=None):
         $ is_discard = anim["target"] == "discard"
         $ anim_time = delay + duration
 
-        # Track the card in flight
         $ in_flight_cards.add(card)
-
-        # Update total max animation time
         $ max_duration = max(max_duration, anim_time)
 
-        # Animated movement of the card
         add Transform(
             anim.get("override_img", get_card_image(card)),
             xysize=(CARD_WIDTH, CARD_HEIGHT)
         ) at animate_table_card(src_x, src_y, dest_x, dest_y, delay, duration, is_discard)
 
-        # ⏱ Timer to remove the card after animation ends
         timer anim_time action Function(in_flight_cards.discard, card)
 
-    # Final cleanup after all animations are done
     timer max_duration + 0.01 action [
         SetVariable("table_animations", []),
         SetVariable("in_flight_cards", set()),

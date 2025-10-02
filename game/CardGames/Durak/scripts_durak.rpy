@@ -9,6 +9,9 @@ label start_durak:
     $ start_card_game(DurakGame, "durak")
 
 label durak_game_loop:
+    $ print(card_game.player.hand)
+    $ print(card_game.opponent.hand)
+
     if is_dealing:
 #         $ renpy.block_rollback()
         $ is_dealing = False

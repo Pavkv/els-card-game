@@ -21,9 +21,15 @@ class CardGame:
             elif biased_draw[0] == "opponent":
                 self.bias["opponent"] = float(biased_draw[1])
 
-    def start_game(self, n=6, sort_hand=False):
+    def start_game(self, n=6, sort_hand=False, first_player_selection=False):
         self.player.draw_from_deck(self.deck, n, sort_hand, self.bias["player"])
         self.opponent.draw_from_deck(self.deck, n, sort_hand, self.bias["opponent"])
-        self.first_player = random.choice([self.player, self.opponent])
+        if first_player_selection:
+            if self.player.lowest_trump_card(self.deck.trump_suit) and (not self.opponent.lowest_trump_card(self.deck.trump_suit) or self.player.lowest_trump_card(self.deck.trump_suit) < self.opponent.lowest_trump_card(self.deck.trump_suit)):
+                self.first_player = self.player
+            else:
+                self.first_player = self.opponent
+        else:
+            self.first_player = random.choice([self.player, self.opponent])
         self.state = "player_turn" if self.first_player == self.player else "opponent_turn"
         self.current_turn = self.first_player

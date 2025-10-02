@@ -47,11 +47,26 @@ init python:
         show_anim(function=after_anim)
 
     # ----------------------------
+    # Game Over
+    # ----------------------------
+    def game_over_check():
+        """Check if the game is over and handle the result."""
+        game_over = card_game.game_over()
+        if game_over[0]:
+#             renpy.block_rollback()
+            card_game.result = game_over[1]
+            print("Game Over: ", card_game.result)
+            card_game.state = "result"
+            renpy.jump("witch_game_loop")
+
+    # ----------------------------
     # User Turn Logic
     # ----------------------------
     def witch_after_draw():
         """Call this after player has pressed the 'draw' button and animation finishes."""
         compute_hand_layout()
+
+        game_over_check()
 
         if card_game.player.count_pairs_excluding_witch() > 0:
             card_game.user_turn = "discard_pairs"
@@ -64,6 +79,8 @@ init python:
         """Call this after player has pressed 'discard_pairs' and animation finishes."""
         compute_hand_layout()
 
+        game_over_check()
+
         if card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
             card_game.user_turn = "exchange"
         else:
@@ -73,6 +90,8 @@ init python:
         """Call this after player has selected and taken a card from opponent."""
         compute_hand_layout()
 
+        game_over_check()
+
         if card_game.player.count_pairs_excluding_witch() > 0:
             card_game.user_turn = "discard_pairs"
         else:
@@ -80,6 +99,7 @@ init python:
 
     def witch_end_player_turn():
         """Call this when player presses 'end_turn' button or finishes last action."""
+        game_over_check()
         card_game.state = "opponent_turn"
         compute_hand_layout()
 
@@ -92,25 +112,32 @@ init python:
         deck = card_game.deck
         player = card_game.player
 
+        game_over_check()
+
+        card_game.state = "opponent_busy"
+
         def end_turn():
+            game_over_check()
             print("AI ends turn.")
             card_game.state = "player_turn"
             card_game.player_turn_start()
             compute_hand_layout()
 
         def maybe_discard_after_exchange():
+            game_over_check()
             if opponent.count_pairs_excluding_witch() > 0:
                 print("AI discards pairs after exchange.")
-                discard_pairs_anim(side=1, on_finish=end_turn)
+                discard_pairs_anim(side=1, on_finish=lambda: delay_anim(on_finish=end_turn))
             else:
-                end_turn()
+                delay_anim(on_finish=end_turn)
 
         def maybe_exchange():
+            game_over_check()
             if opponent.can_exchange_now(deck):
                 print("AI attempts to exchange a card.")
                 if len(player.hand) == 0:
                     print("User has no cards, AI skips exchange.")
-                    end_turn()
+                    delay_anim(on_finish=end_turn)
                 else:
                     card_game.state = "wait_choice_opponent"
                     donor = card_game.player
@@ -123,28 +150,39 @@ init python:
 
                     take_card_anim(from_side=0, to_side=1, index=index, on_finish=maybe_discard_after_exchange)
             else:
-                end_turn()
-
-        def maybe_discard_after_draw():
-            if opponent.count_pairs_excluding_witch() > 0:
-                print("AI discards pairs after draw.")
-                discard_pairs_anim(side=1, on_finish=maybe_exchange)
-            else:
-                maybe_exchange()
-
-        def maybe_discard_before_exchange():
-            if opponent.count_pairs_excluding_witch() > 0:
-                print("AI discards pairs before exchange.")
-                discard_pairs_anim(side=1, on_finish=maybe_exchange)
-            else:
-                maybe_exchange()
+                delay_anim(on_finish=end_turn)
 
         def after_draw():
             compute_hand_layout()
-            maybe_discard_after_draw()
+            game_over_check()
+            if card_game.player.count_pairs_excluding_witch() > 0:
+                discard_pairs_anim(side=1, on_finish=lambda: delay_anim(on_finish=end_turn))
+            elif card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+                maybe_exchange()
+            else:
+                delay_anim(on_finish=end_turn)
+
+        def after_discard():
+            game_over_check()
+            if card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+                maybe_exchange()
+            else:
+                delay_anim(on_finish=end_turn)
+
+        def after_exchange():
+            game_over_check()
+            if card_game.player.count_pairs_excluding_witch() > 0:
+                discard_pairs_anim(side=1, on_finish=lambda: delay_anim(on_finish=end_turn))
+            else:
+                delay_anim(on_finish=end_turn)
 
         if len(opponent.hand) < 6 and len(deck.cards) > 0:
             print("AI draws cards.")
             draw_anim(side=1, target_count=6, on_finish=after_draw)
+        elif card_game.opponent.count_pairs_excluding_witch() > 0:
+            print("AI has pairs to discard.")
+            discard_pairs_anim(side=1, on_finish=after_discard)
+        elif opponent.can_exchange_now(deck) and len(card_game.player.hand) > 0:
+            maybe_exchange()
         else:
-            maybe_discard_before_exchange()
+            delay_anim(on_finish=end_turn)
