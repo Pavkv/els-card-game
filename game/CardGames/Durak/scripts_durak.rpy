@@ -6,6 +6,7 @@ label start_durak:
     $ base_card_img_src = "images/cards/cards"
     $ biased_draw = ["opponent", 0.5]
     $ day2_game_with_Alice = False
+    $ last_winner = "player"
     $ start_card_game(DurakGame, "durak")
 
 label durak_game_loop:

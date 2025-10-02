@@ -1,39 +1,39 @@
-Thu Oct  2 13:22:00 2025
+Thu Oct  2 19:51:22 2025
 Darwin-24.6.0-x86_64-i386-64bit
 Ren'Py 7.4.11.2266
  
 
-Bootstrap to the start of init.init took 0.06s
+Bootstrap to the start of init.init took 0.05s
 Early init took 0.00s
 Loader init took 0.00s
 Loading error handling took 0.01s
-Loading script took 0.10s
+Loading script took 0.07s
 Loading save slot metadata. took 0.00s
 Loading persistent took 0.00s
 Importing _renpysteam: ImportError('No module named _renpysteam',)
-Running init code took 0.03s
+Running init code took 0.02s
 Loading analysis data took 0.01s
 Analyze and compile ATL took 0.00s
 Index archives took 0.00s
 Backing up script files to '/Users/pavelzobov/Library/RenPy/backups/Els':
-Dump and make backups. took 0.04s
+Dump and make backups. took 0.03s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
 Initial gc. took 0.01s
 DPI scale factor: 1.000000
 Creating interface object took 0.00s
 Cleaning stores took 0.00s
-Init translation took 0.02s
+Init translation took 0.01s
 Build styles took 0.00s
 Load screen analysis took 0.00s
 Analyze screens took 0.01s
-Save screen analysis took 0.02s
+Save screen analysis took 0.01s
 Prepare screens took 0.03s
 Save pyanalysis. took 0.00s
 Save bytecode. took 0.01s
 Running _start took 0.00s
 Performance test:
-Interface start took 0.37s
+Interface start took 0.18s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 1470, 956)
@@ -45,15 +45,15 @@ Version: '2.1 Metal - 89.4'
 Display Info: None
 Screen sizes: virtual=(1920, 1080) physical=(1073, 604) drawable=(2146, 1208)
 Maximum texture size: 4096x4096
-[6C, 9S, JS, 9H, 10H, KH]
-[7C, 9D, AC, 6H, 8H, QH]
-[6C, 9S, JS, 9H, 10H, KH]
-[7C, 9D, AC, 6H, 8H, QH]
-AI attacked successfully with: [7C]
+[AH, QH, 9C, 9H, 8H, 9S]
+[7D, 8D, 10H, 6C, 10S, 7C]
+[AH, QH, 9C, 9H, 8H, 9S]
+[7D, 8D, 10H, 6C, 10S, 7C]
+discard_pairs
 
 Full traceback:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 56, in script
-    call screen durak
+  File "game/CardGames/Witch/scripts_witch.rpy", line 46, in script
+    call screen witch
   File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2015, in execute
     self.call("execute")
   File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2003, in call
@@ -85,8 +85,8 @@ Full traceback:
 AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 
 While running game code:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 56, in script
-    call screen durak
+  File "game/CardGames/Witch/scripts_witch.rpy", line 46, in script
+    call screen witch
   File "renpy/common/000statements.rpy", line 569, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
   File "renpy/common/00action_menu.rpy", line 220, in __call__

@@ -11,8 +11,8 @@ class DurakGame(CardGame):
         self.opponent = AIDurak(opponent_name)
         self.table = Table()
 
-    def start_game(self, n=6, sort_hand=True, first_player_selection=True):
-        CardGame.start_game(self, n=n, sort_hand=sort_hand, first_player_selection=first_player_selection)
+    def start_game(self, n=6, sort_hand=True):
+        CardGame.start_game(self, n=n, sort_hand=sort_hand)
 
     def can_attack(self, attacker, num_of_attack_cards=0):
         """Check if the attacker can attack."""

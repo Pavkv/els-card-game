@@ -12,6 +12,7 @@ init:
     default card_game_avatar = None
     default biased_draw = None
     default made_turn = False
+    default last_winner = None
 
     # Layout constants
     default DECK_X = 13

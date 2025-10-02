@@ -152,7 +152,7 @@ init python:
         - opponent_avatar: avatar image for the opponent
         - biased_draw: optional bias config
         """
-        global card_game, player_name, opponent_name, biased_draw, card_game_name
+        global card_game, player_name, opponent_name, biased_draw, card_game_name, last_winner
         global base_cover_img_src, base_card_img_src, card_game_avatar
         global dealt_cards, is_dealing, deal_cards
 
@@ -161,7 +161,15 @@ init python:
         base_cover_img_src = base_card_img_src + "/cover.png"
         card_game.opponent.avatar = card_game_avatar
 
-        card_game.start_game(num_of_cards)
+        if last_winner:
+            first_player_selection = last_winner
+        elif not last_winner and isinstance(card_game, DurakGame):
+            first_player_selection = "lowest_trump"
+        else:
+            first_player_selection = None
+
+        card_game.select_first_player(first_player_selection=first_player_selection)
+        card_game.start_game(n=num_of_cards)
         compute_hand_layout()
 
         dealt_cards = []
