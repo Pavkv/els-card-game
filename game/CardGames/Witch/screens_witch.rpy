@@ -11,29 +11,19 @@ screen witch():
             background None
             xpos 1750
             ypos 945
-            if len(card_game.player.hand) < 6 and len(card_game.deck.cards) > 0 and not made_turn:
+            has vbox
+            if card_game.user_turn == "draw":
                 frame:
                     xsize 150
                     padding (0, 0)
+                    ypos 30
                     has vbox
                     textbutton "{color=#fff}Взять{/color}":
                         style "card_game_button"
                         text_size 25
-                        action [Function(draw_anim, 0), SetVariable("made_turn", True)]
+                        action Function(draw_anim, side=0, target_count=6, on_finish=witch_after_draw)
 
-            elif card_game.player.count_pairs_excluding_witch() > 0:
-                if made_turn:
-                    $ action = [
-                        Function(discard_pairs_anim, 0),
-                        SetVariable("made_turn", False),
-                        SetVariable("card_game.state", "opponent_turn"),
-                        Jump(card_game_name + "_game_loop")
-                    ]
-                else:
-                    $ action = [
-                        Function(discard_pairs_anim, 0)
-                    ]
-
+            elif card_game.user_turn == "discard_pairs":
                 frame:
                     xsize 150
                     padding (0, 0)
@@ -41,12 +31,9 @@ screen witch():
                     textbutton "{color=#fff}Скинуть\nпары{/color}":
                         style "card_game_button"
                         text_size 18
-                        action action
+                        action Function(discard_pairs_anim, side=0, on_finish=witch_after_discard)
 
-            elif card_game.player.can_exchange_now(card_game.deck) and card_game.state != "wait_choice" and len(card_game.opponent.hand) == 0:
-                timer 0.5 action SetVariable("card_game.state", "opponent_turn")
-
-            elif card_game.player.can_exchange_now(card_game.deck) and card_game.state != "wait_choice" and len(card_game.opponent.hand) > 0:
+            elif card_game.user_turn == "exchange":
                 frame:
                     xsize 150
                     padding (0, 0)
@@ -54,4 +41,7 @@ screen witch():
                     textbutton "{color=#fff}Вытянуть\nкарту{/color}":
                         style "card_game_button"
                         text_size 18
-                        action SetVariable("card_game.state", "wait_choice")
+                        action [SetVariable("card_game.state", "wait_choice"), SetVariable("card_game.user_turn", None)]
+
+            elif card_game.user_turn == "end_turn":
+                timer 0.5 action Function(witch_end_player_turn)

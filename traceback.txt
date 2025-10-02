@@ -1,54 +1,74 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 53, in script
-    call screen durak
+  File "game/CardGames/Witch/scripts_witch.rpy", line 52, in script
+    call screen witch
   File "renpy/common/000statements.rpy", line 569, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
-  File "renpy/common/00action_menu.rpy", line 220, in __call__
-    layout.yesno_screen(layout.QUIT, Quit(False))
-  File "renpy/common/00layout.rpy", line 527, in yesno_screen
-    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
-  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
-    rv = layout.yesno_prompt(*args)
-AttributeError: 'Layout' object has no attribute 'yesno_prompt'
+  File "renpy/common/00action_other.rpy", line 537, in __call__
+    rv = self.callable(*self.args, **self.kwargs)
+  File "game/CardGames/Witch/py_witch.rpy", line 45, in after_anim
+    on_finish()
+  File "game/CardGames/Witch/py_witch.rpy", line 128, in maybe_exchange
+    end_turn()
+  File "game/CardGames/Witch/py_witch.rpy", line 97, in end_turn
+    renpy.pause(5.0)
+Exception: Cannot start an interaction in the middle of an interaction, without creating a new context.
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 53, in script
-    call screen durak
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2015, in execute
+  File "game/CardGames/Witch/scripts_witch.rpy", line 52, in script
+    call screen witch
+  File "renpy/ast.py", line 2015, in execute
     self.call("execute")
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2003, in call
+  File "renpy/ast.py", line 2003, in call
     return renpy.statements.call(method, parsed, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/statements.py", line 278, in call
+  File "renpy/statements.py", line 278, in call
     return method(parsed, *args, **kwargs)
   File "renpy/common/000statements.rpy", line 569, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/exports.py", line 3136, in call_screen
+  File "renpy/exports.py", line 3136, in call_screen
     rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ui.py", line 298, in interact
+  File "renpy/ui.py", line 298, in interact
     rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 3325, in interact
+  File "renpy/display/core.py", line 3325, in interact
     repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 4035, in interact_core
-    self.quit_event()
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 2977, in quit_event
-    renpy.display.behavior.run(renpy.config.quit_action)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 330, in run
+  File "renpy/display/core.py", line 4160, in interact_core
+    rv = root_widget.event(ev, x, y, 0)
+  File "renpy/display/layout.py", line 1102, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+  File "renpy/display/layout.py", line 1102, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+  File "renpy/display/layout.py", line 1102, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+  File "renpy/display/screen.py", line 727, in event
+    rv = self.child.event(ev, x, y, st)
+  File "renpy/display/layout.py", line 1102, in event
+    rv = i.event(ev, x - xo, y - yo, cst)
+  File "renpy/display/behavior.py", line 2296, in event
+    return run(self.function, *self.args, **self.kwargs)
+  File "renpy/display/behavior.py", line 323, in run
+    new_rv = run(i, *args, **kwargs)
+  File "renpy/display/behavior.py", line 330, in run
     return action(*args, **kwargs)
-  File "renpy/common/00action_menu.rpy", line 220, in __call__
-    layout.yesno_screen(layout.QUIT, Quit(False))
-  File "renpy/common/00layout.rpy", line 527, in yesno_screen
-    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/game.py", line 284, in invoke_in_new_context
-    return callable(*args, **kwargs)
-  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
-    rv = layout.yesno_prompt(*args)
-AttributeError: 'Layout' object has no attribute 'yesno_prompt'
+  File "renpy/common/00action_other.rpy", line 537, in __call__
+    rv = self.callable(*self.args, **self.kwargs)
+  File "game/CardGames/Witch/py_witch.rpy", line 45, in after_anim
+    on_finish()
+  File "game/CardGames/Witch/py_witch.rpy", line 128, in maybe_exchange
+    end_turn()
+  File "game/CardGames/Witch/py_witch.rpy", line 97, in end_turn
+    renpy.pause(5.0)
+  File "renpy/exports.py", line 1563, in pause
+    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay)
+  File "renpy/ui.py", line 298, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "renpy/display/core.py", line 3301, in interact
+    raise Exception("Cannot start an interaction in the middle of an interaction, without creating a new context.")
+Exception: Cannot start an interaction in the middle of an interaction, without creating a new context.
 
-Darwin-24.6.0-x86_64-i386-64bit
+Windows-10-10.0.26100
 Ren'Py 7.4.11.2266
  
-Wed Oct  1 16:16:17 2025
+Wed Oct  1 22:42:26 2025

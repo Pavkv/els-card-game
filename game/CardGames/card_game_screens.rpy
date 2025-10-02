@@ -152,15 +152,15 @@ screen game_phase_and_controls():
                         action [SetVariable("confirm_attack", True), Function(durak_confirm_selected_attack)]
 
         elif isinstance(card_game, WitchGame) and card_game.state == "wait_choice" and selected_exchange_card_index_opponent != -1:
-                frame:
-                    xsize 150
-                    padding (0, 0)
-                    ypos 30
-                    has vbox
-                    textbutton "{color=#fff}Подтвердить{/color}":
-                        style "card_game_button"
-                        text_size 18
-                        action Function(witch_player_turn)
+            frame:
+                xsize 150
+                padding (0, 0)
+                ypos 30
+                has vbox
+                textbutton "{color=#fff}Подтвердить{/color}":
+                    style "card_game_button"
+                    text_size 18
+                    action [SetVariable("selected_exchange_card_index_opponent", -1), Function(take_card_anim, from_side=1, to_side=0, index=selected_exchange_card_index_opponent, on_finish=witch_after_exchange)]
 
         elif isinstance(card_game, ElsGame):
             if card_game.round < 5:

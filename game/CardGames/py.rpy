@@ -251,7 +251,8 @@ init python:
         to_side,
         index,
         base_delay=0.1,
-        duration=0.4
+        duration=0.4,
+        on_finish=None
     ):
         """
         Animate a card being taken from one player to another.
@@ -262,31 +263,27 @@ init python:
             index (int): index of the card to take from donor
             base_delay (float): delay before animation
             duration (float): animation duration
-            override_img (str or None): override image for animation (e.g. face-down card)
         """
         donor = card_game.player if from_side == 0 else card_game.opponent
         taker = card_game.player if to_side == 0 else card_game.opponent
 
-        # Get card and its visual source position
+        if not donor.hand:
+            print("Donor has no cards.")
+            return
+
+        # Determine source card and its position
         src_card = donor.hand[index] if index < len(donor.hand) else donor.hand[-1]
         sx, sy = hand_card_pos(from_side, src_card)
         dx, dy = next_slot_pos(to_side)
 
-        # Perform the take
-        taken = taker.take_card_from(donor, index=index)
-
-        if hasattr(taker, 'on_after_take'):
-            taker.on_after_take(donor, taken)
-
-        # Temporarily remove card from taker's hand so it doesn't flash early
-        taker.hand.remove(taken)
+        # Temporarily hide the card from layout (remove from both hands for now)
+        donor.hand.remove(src_card)
         compute_hand_layout()
 
-        # Use appropriate image for animation
-        override_img = get_card_image(taken) if to_side == 1 else base_cover_img_src
+        override_img = get_card_image(src_card) if to_side == 1 else base_cover_img_src
 
         table_animations[:] = [{
-            "card": taken,
+            "card": src_card,
             "src_x": sx,
             "src_y": sy,
             "dest_x": dx,
@@ -296,12 +293,20 @@ init python:
             "target": "hand{}".format(to_side),
             "override_img": override_img,
         }]
-        show_anim()
 
-        # Return the card to taker's hand
-        taker.hand.append(taken)
-        compute_hand_layout()
+        def after_anim():
+            # Officially give the card to taker
+            taker.hand.append(src_card)
 
+            if hasattr(taker, 'on_after_take'):
+                taker.on_after_take(donor, src_card)
+
+            compute_hand_layout()
+
+            if on_finish:
+                on_finish()
+
+        show_anim(function=after_anim)
 
     # ----------------------------
     # Reset Game Function

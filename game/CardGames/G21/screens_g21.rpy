@@ -4,7 +4,7 @@ screen game21():
     tag game21_screen
     zorder 1
 
-    if card_game.state != "player_turn":
+    if card_game.state != "player_turn" or card_game.result is not None:
          timer 0.5 action Jump(card_game_name + "_game_loop")
     else:
         frame:

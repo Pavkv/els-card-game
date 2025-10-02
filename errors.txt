@@ -2,10 +2,10 @@
 errors listed below, and try again.
 
 
-File "game/CardGames/py.rpy", line 203: invalid syntax
-        target = f"hand{side}"
-                              ^
+File "game/CardGames/py.rpy", line 293: invalid syntax
+                "target": f"hand{to_side}",
+                                          ^
     
 
 Ren'Py Version: Ren'Py 7.4.11.2266
-Tue Sep 30 15:15:44 2025
+Wed Oct  1 21:59:47 2025

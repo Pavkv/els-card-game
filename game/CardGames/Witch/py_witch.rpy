@@ -2,17 +2,22 @@ init python:
     # ----------------------------
     # Animations
     # ----------------------------
-    def discard_pairs_anim(side, base_delay=0.0, step=0.2):
-        """Animate discarding pairs (e.g. in Witch or other games)."""
+    def discard_pairs_anim(side, base_delay=0.0, step=0.05, on_finish=None):
+        """Animate discarding pairs of cards for the given side (0=player, 1=opponent)"""
         p = card_game.player if side == 0 else card_game.opponent
         before = list(p.hand)
 
+        # Actually discard now (only to compute the diff)
         p.discard_pairs_excluding_witch(card_game.deck)
 
         after = list(p.hand)
-        removed = diff_removed(before, after)  # returns (index, card) tuples
+        removed = diff_removed(before, after)
+
+        # Restore the hand so animation still works visually
+        p.hand = list(before)
 
         table_animations[:] = []
+
         for i, (idx, card) in enumerate(removed):
             sx, sy = hand_card_pos(side, card, override_index=idx)
 
@@ -25,84 +30,121 @@ init python:
                 "dest_x": DISCARD_X,
                 "dest_y": DISCARD_Y,
                 "delay": base_delay + i * step,
+                "duration": 0.4,
                 "target": "discard",
                 "override_img": override_img,
             }
 
             table_animations.append(anim)
 
-        show_anim()
-        p.shaffle_hand()
-        compute_hand_layout()
+        def after_anim():
+            p.discard_pairs_excluding_witch(card_game.deck)
+            p.shaffle_hand()
+            compute_hand_layout()
+            if on_finish:
+                on_finish()
+
+        show_anim(function=after_anim)
 
     # ----------------------------
-    # Turns
+    # User Turn Logic
     # ----------------------------
-    def witch_player_turn():
-        """AI turn logic for Witch game"""
-        global selected_exchange_card_index_opponent, hovered_card_index_exchange, made_turn
-
-        take_card_anim(1, 0, selected_exchange_card_index_opponent)
-        selected_exchange_card_index_opponent = -1
-        hovered_card_index_exchange = -1
+    def witch_after_draw():
+        """Call this after player has pressed the 'draw' button and animation finishes."""
         compute_hand_layout()
 
-        if  card_game.player.count_pairs_excluding_witch() > 0:
-            card_game.state = "player_turn"
-            made_turn = True
+        if card_game.player.count_pairs_excluding_witch() > 0:
+            card_game.user_turn = "discard_pairs"
+        elif card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+            card_game.user_turn = "exchange"
         else:
-            card_game.state = "opponent_turn"
+            card_game.user_turn = "end_turn"
 
+    def witch_after_discard():
+        """Call this after player has pressed 'discard_pairs' and animation finishes."""
+        compute_hand_layout()
+
+        if card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+            card_game.user_turn = "exchange"
+        else:
+            card_game.user_turn = "end_turn"
+
+    def witch_after_exchange():
+        """Call this after player has selected and taken a card from opponent."""
+        compute_hand_layout()
+
+        if card_game.player.count_pairs_excluding_witch() > 0:
+            card_game.user_turn = "discard_pairs"
+        else:
+            card_game.user_turn = "end_turn"
+
+    def witch_end_player_turn():
+        """Call this when player presses 'end_turn' button or finishes last action."""
+        card_game.state = "opponent_turn"
+        compute_hand_layout()
+
+    # ----------------------------
+    # Opponent Turn Logic
+    # ----------------------------
     def witch_opponent_turn():
         """AI turn logic for Witch game"""
         opponent = card_game.opponent
         deck = card_game.deck
         player = card_game.player
 
-        # 1. AI draws if hand < 6 and deck has cards
-        if len(opponent.hand) < 6 and len(deck.cards) > 0:
-            print("AI draws cards.")
-            draw_anim(1, 6)
+        def end_turn():
+            print("AI ends turn.")
+            card_game.state = "player_turn"
+            card_game.player_turn_start()
+            compute_hand_layout()
 
-            # Recalculate layout and discard pairs after drawing
+        def maybe_discard_after_exchange():
+            if opponent.count_pairs_excluding_witch() > 0:
+                print("AI discards pairs after exchange.")
+                discard_pairs_anim(side=1, on_finish=end_turn)
+            else:
+                end_turn()
+
+        def maybe_exchange():
+            if opponent.can_exchange_now(deck):
+                print("AI attempts to exchange a card.")
+                if len(player.hand) == 0:
+                    print("User has no cards, AI skips exchange.")
+                    end_turn()
+                else:
+                    card_game.state = "wait_choice_opponent"
+                    donor = card_game.player
+
+                    index = (
+                        opponent.choose_exchange_index(donor)
+                        if hasattr(opponent, "choose_exchange_index")
+                        else renpy.random.randint(0, len(donor.hand) - 1)
+                    )
+
+                    take_card_anim(from_side=0, to_side=1, index=index, on_finish=maybe_discard_after_exchange)
+            else:
+                end_turn()
+
+        def maybe_discard_after_draw():
             if opponent.count_pairs_excluding_witch() > 0:
                 print("AI discards pairs after draw.")
-                compute_hand_layout()
-                renpy.pause(1.5)
-                discard_pairs_anim(1)
-
-        # 2. If AI has pairs, discard them
-        if opponent.count_pairs_excluding_witch() > 0:
-            print("AI discards pairs before exchange.")
-            compute_hand_layout()
-            renpy.pause(1.5)
-            discard_pairs_anim(1)
-
-        # 3. Else attempt to exchange a card
-        if opponent.can_exchange_now(deck):
-            print("AI attempts to exchange a card.")
-            if len(player.hand) == 0:
-                print("User has no cards, AI skips exchange.")
+                discard_pairs_anim(side=1, on_finish=maybe_exchange)
             else:
-                card_game.state = "wait_choice_opponent"
-                donor = card_game.player
+                maybe_exchange()
 
-                index = (
-                    opponent.choose_exchange_index(donor)
-                    if hasattr(opponent, "choose_exchange_index")
-                    else renpy.random.randint(0, len(donor.hand) - 1)
-                )
+        def maybe_discard_before_exchange():
+            if opponent.count_pairs_excluding_witch() > 0:
+                print("AI discards pairs before exchange.")
+                discard_pairs_anim(side=1, on_finish=maybe_exchange)
+            else:
+                maybe_exchange()
 
-                renpy.pause(1.5)
-                take_card_anim(0, 1, index)
+        def after_draw():
+            compute_hand_layout()
+            maybe_discard_after_draw()
 
-                # Discard after exchange
-                if opponent.count_pairs_excluding_witch() > 0:
-                    print("AI discards pairs after exchange.")
-                    compute_hand_layout()
-                    renpy.pause(1.5)
-                    discard_pairs_anim(1)
-
-        # 4. End AI turn
-        card_game.state = "player_turn"
-        compute_hand_layout()
+        if len(opponent.hand) < 6 and len(deck.cards) > 0:
+            print("AI draws cards.")
+            draw_anim(side=1, target_count=6, on_finish=after_draw)
+        else:
+            maybe_discard_before_exchange()

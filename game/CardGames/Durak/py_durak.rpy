@@ -2,7 +2,7 @@ init python:
      # --------------------
      # Durak Animations
      # --------------------
-    def animate_and_resolve_table(step_delay=0.1, anim_duration=0.25):
+    def animate_and_resolve_table(step_delay=0.05, anim_duration=0.1):
         global hovered_card_index
         """
         Animate cards being cleared from the table and defer logic until after animation.
