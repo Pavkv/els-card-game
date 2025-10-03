@@ -1,8 +1,8 @@
 # coding=utf-8
 import random
 
-from game.CardGames.Classes.Player import Player
-from game.CardGames.Classes.Deck import Deck
+from Player import Player
+from Deck import Deck
 
 class CardGame:
     def __init__(self, player_name="Вы", biased_draw=None):

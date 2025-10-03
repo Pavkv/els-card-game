@@ -14,7 +14,6 @@ screen card_game_base_ui():
                 style "card_game_button"
                 text_size 23
                 action [
-                    Function(reset_card_game),
                     SetVariable("in_game", True),
                     Hide("card_game_base_ui"),
                     Return(),

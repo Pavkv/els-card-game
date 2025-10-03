@@ -1,6 +1,6 @@
 # coding=utf-8
-from game.CardGames.Classes.Card import Card
-from game.CardGames.Classes.Player import Player
+from Card import Card
+from Player import Player
 
 class AI21(Player):
     def __init__(self, name):

@@ -1,5 +1,5 @@
-from game.CardGames.Classes.Card import Card
-from game.CardGames.Classes.Player import Player
+from Card import Card
+from Player import Player
 
 class AIDurak(Player):
     def __init__(self, name):

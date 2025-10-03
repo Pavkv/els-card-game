@@ -1,12 +1,4 @@
 label start_durak:
-    $ player_name = renpy.input("Введите ваше имя", length=20)
-    $ opponent_name = "Противник"
-    $ cards_bg = "images/bg/bg_14.jpg"
-    $ in_game = False
-    $ base_card_img_src = "images/cards/cards"
-    $ biased_draw = ["opponent", 0.5]
-    $ day2_game_with_Alice = False
-    $ last_winner = "player"
     $ start_card_game(DurakGame, "durak")
 
 label durak_game_loop:
@@ -51,7 +43,12 @@ label durak_game_loop:
                     $ persistent.achievements["Адмирал"] = True
             jump expression card_game_results[card_game.result]
         else:
-            $ reset_card_game()
+            if card_game.result == card_game.player.name:
+                "Вы выиграли!"
+            elif card_game.result == card_game.opponent.name:
+                "Вы проиграли."
+            else:
+                "Ничья."
             jump card_games
 
     call screen durak

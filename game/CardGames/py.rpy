@@ -5,7 +5,7 @@ init python:
     from CardGames.Durak.DurakGame import DurakGame
     from CardGames.G21.Game21 import Game21
     from CardGames.Witch.WitchGame import WitchGame
-    from game.CardGames.Els.ElsGame import ElsGame
+    from CardGames.Els.ElsGame import ElsGame
 
     # Global variables
     CARD_WIDTH, CARD_HEIGHT, CARD_SPACING = 157, 237, 118

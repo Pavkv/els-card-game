@@ -156,12 +156,12 @@ init python:
         card_game.result = results[0]
 
         # Player combination: name and indexes
-        result_combination_player = results[1][0]
+        result_combination_player = results[1][0].encode('utf-8').decode('unicode_escape')
         result_combination_indexes_player = results[1][3]
         print("Player combination: ", result_combination_player, result_combination_indexes_player)
 
         # Opponent combination: name and indexes
-        result_combination_opponent = results[2][0]
+        result_combination_opponent = results[2][0].encode('utf-8').decode('unicode_escape')
         result_combination_indexes_opponent = results[2][3]
         print("Opponent combination: ", result_combination_opponent, result_combination_indexes_opponent)
 
