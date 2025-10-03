@@ -360,21 +360,11 @@ init python:
         print("Player hand before ending turn:", card_game.player.hand)
         print("Opponent hand before ending turn:", card_game.opponent.hand)
 
-        # Check for special two sixes attack
-        attack_cards = [atk for atk, (_b, _d) in card_game.table.table.items()]
-        print("Attack cards:", attack_cards)
-
-        last_attack_two_sixes = False
-        if len(attack_cards) == 2:
-            last_attack_two_sixes = all(
-                getattr(c, "rank", None) in ("6", 6) for c in attack_cards
-            )
-
-        lost_to_two_sixes = (
-            card_game.current_turn == card_game.opponent
-            and last_attack_two_sixes
-            and card_game.deck.is_empty()
-        )
+        # Lost to two sixes check
+        if card_game.current_turn == card_game.opponent and card_game.deck.is_empty():
+            lost_to_two_sixes = card_game.check_for_loss_to_two_sixes()
+            if lost_to_two_sixes:
+                print("You lost to two sixes in the last round!")
 
         card_game.opponent.remember_table(card_game.table)
         card_game.opponent.remember_discard(card_game.deck.discard)

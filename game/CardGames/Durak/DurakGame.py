@@ -85,3 +85,17 @@ class DurakGame(CardGame):
             self.result = self.player.name
         else:
             self.result = self.opponent.name
+
+
+    def check_for_loss_to_two_sixes(self):
+        """Check for special achievements."""
+        # Get list of attack cards from the table
+        attack_cards = [atk for atk, (_b, _d) in self.table.table.items()]
+
+        # Check if last attack was two sixes and it's the last round
+        last_attack_two_sixes = (
+            len(attack_cards) == 2
+            and all(getattr(c, "rank", None) in ("6", 6) for c in attack_cards)
+        )
+
+        return len(self.opponent.hand) == 0 and last_attack_two_sixes

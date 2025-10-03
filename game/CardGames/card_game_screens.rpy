@@ -16,7 +16,7 @@ screen card_game_base_ui():
                 action [
                     SetVariable("in_game", True),
                     Hide("card_game_base_ui"),
-                    Return(),
+                    Jump("card_games")
                 ]
 
     # Opponent Avatar & Info
@@ -254,7 +254,7 @@ screen opponent_card_hand_display():
             xsize 150
             yoffset 10
             padding (5, 5)
-            text "[opponent_hand_text]" color "#ffffff" text_align 0.5 align (0.5, 0.5) size 25
+            text "[opponent_hand_text]" color "#ffffff" text_align 0.5 align (0.5, 0.5)
 
     for i, card in enumerate(card_game.opponent.hand):
 
@@ -293,7 +293,7 @@ screen opponent_card_hand_display():
                     action If(
                         (isinstance(card_game, WitchGame) or isinstance(card_game, ElsGame)),
                         SetVariable("selected_exchange_card_index_opponent", i),
-                        Return()
+                        None
                     )
                     hovered If(hovered_card_index_exchange != i, SetVariable("hovered_card_index_exchange", i))
                     unhovered If(hovered_card_index_exchange == i, SetVariable("hovered_card_index_exchange", -1))

@@ -96,7 +96,7 @@ init python:
             return Function(durak_handle_card_click, index)
         elif isinstance(card_game, ElsGame) and card_game.state == "player_defend":
             return Function(lambda: els_swap_cards_player(index))
-        return Return()
+        return None
 
     # ----------------------------
     # Position Helpers
@@ -323,15 +323,15 @@ init python:
     # Reset Game Function
     # ----------------------------
     def reset_card_game():
+        print("Resetting card game state...")
+        renpy.hide("els")
+        renpy.hide("durak")
+        renpy.hide("game21")
+        renpy.hide("witch")
         s = store
 
         # base
         s.in_game = True
-        s.card_game = None
-        s.player_name = None
-        s.base_card_img_src = None
-        s.base_cover_img_src = None
-        s.cards_bg = None
         s.hovered_card_index = -1
         s.dealt_cards = []
         s.is_dealing = False
