@@ -285,15 +285,21 @@ init python:
         """Handles the opponent's defense logic sequentially with animation."""
         defense_queue = []
 
-        # Queue up all current defense moves
+        reserved_cards = set()
+
         for i, (attack_card, (beaten, _)) in enumerate(card_game.table.table.items()):
             if not beaten:
-                def_card = card_game.opponent.defense(attack_card, card_game.deck.trump_suit)
+                def_card = card_game.opponent.defense(
+                    attack_card,
+                    card_game.deck.trump_suit,
+                    exclude=reserved_cards
+                )
                 if def_card:
                     defense_queue.append((i, attack_card, def_card))
+                    reserved_cards.add(def_card)  # Reserve this card
                 else:
                     print("AI cannot defend against:", attack_card)
-                    break  # Stop trying to defend
+                    break
 
         def do_defense(index=0):
             if index >= len(defense_queue):

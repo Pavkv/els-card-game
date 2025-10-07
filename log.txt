@@ -1,311 +1,113 @@
-Thu Oct  2 21:15:24 2025
-Windows-10-10.0.26100
+Tue Oct  7 11:26:27 2025
+Darwin-24.6.0-x86_64-i386-64bit
 Ren'Py 7.4.11.2266
  
 
-Bootstrap to the start of init.init took 0.06s
+Bootstrap to the start of init.init took 0.05s
 Early init took 0.00s
-Loader init took 0.02s
-Loading error handling took 0.02s
-Loading script took 0.57s
-Loading save slot metadata. took 0.01s
+Loader init took 0.01s
+Loading error handling took 0.01s
+Loading script took 0.07s
+Loading save slot metadata. took 0.00s
 Loading persistent took 0.00s
 Importing _renpysteam: ImportError('No module named _renpysteam',)
-Running init code took 0.08s
+Running init code took 0.03s
 Loading analysis data took 0.01s
 Analyze and compile ATL took 0.00s
 Index archives took 0.00s
-Backing up script files to 'C:\\Users\\Admin\\AppData\\Roaming/RenPy/backups\\els-card-game':
-Dump and make backups. took 0.06s
+Backing up script files to '/Users/pavelzobov/Library/RenPy/backups/Els':
+Dump and make backups. took 0.03s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
-Initial gc. took 0.02s
+Initial gc. took 0.01s
 DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: Disabled thread optimizations.
-Creating interface object took 0.21s
+Creating interface object took 0.00s
 Cleaning stores took 0.00s
-Init translation took 0.02s
+Init translation took 0.01s
 Build styles took 0.00s
 Load screen analysis took 0.00s
 Analyze screens took 0.01s
-Save screen analysis took 0.02s
-Prepare screens took 0.04s
-Save pyanalysis. took 0.02s
-Save bytecode. took 0.02s
+Save screen analysis took 0.01s
+Prepare screens took 0.03s
+Save pyanalysis. took 0.00s
+Save bytecode. took 0.01s
 Running _start took 0.00s
 Performance test:
-Interface start took 0.09s
+Interface start took 0.25s
 
 Initializing gl2 renderer:
-primary display bounds: (0, 0, 3440, 1440)
+primary display bounds: (0, 0, 1470, 956)
 swap interval: 1 frames
 Windowed mode.
-Vendor: 'NVIDIA Corporation'
-Renderer: 'NVIDIA GeForce RTX 3080/PCIe/SSE2'
-Version: '4.6.0 NVIDIA 576.88'
+Vendor: 'Apple'
+Renderer: 'Apple M3'
+Version: '2.1 Metal - 89.4'
 Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1073, 604) drawable=(1073, 604)
+Screen sizes: virtual=(1920, 1080) physical=(1073, 604) drawable=(2146, 1208)
 Maximum texture size: 4096x4096
-[QC, 9D, 7D, AH, AD, AC]
-[QH, 6H, 6D, 10D, KS, 9H]
-[QC, 9D, 7D, AH, AD, AC]
-[QH, 6H, 6D, 10D, KS, 9H]
-discard_pairs
-[9D, 7D, QC, AH]
-[QH, 6H, 6D, 10D, KS, 9H]
-end_turn
-AI has pairs to discard.
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-[9D, 7D, QC, AH]
-[QH, KS, 9H, 10D]
-end_turn
-AI ends turn.
-[6S, 7D, AH, 8S, QC]
-[QH, KS, 10D]
-end_turn
-AI draws cards.
-[6S, 7D, AH, 8S, QC]
-[QH, KS, 10D]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-[6S, 7D, AH, 8S, QC]
-[KS, JH, QH, KC]
-end_turn
-AI ends turn.
-[8S, 7D, QC, AH]
-[KS, JH, QH, KC]
-end_turn
-AI draws cards.
-AI attempts to exchange a card.
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[7D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-AI ends turn.
-[8D, 10S, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S]
-end_turn
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-[8D, QC, AH]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-AI ends turn.
-[7S, 8D, AH, 9S]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[7S, 8D, 9S]
-[KS, JH, QH, KC, AS, 9C, 8S, 10S]
-end_turn
-AI discards pairs after exchange.
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-[7S, 8D, 9S]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-AI ends turn.
-[QD, 8D, 9S, JS]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[QD, 8D, JS]
-[8S, KS, 10S, QH, 9C, JH, KC]
-end_turn
-AI discards pairs after exchange.
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-[QD, 8D, JS]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-AI ends turn.
-[QD, 8D]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[8D]
-[10S, JH, KC, 8S, QH, KS]
-end_turn
-AI discards pairs after exchange.
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-[8D]
-[8S, JH, KC, KS, 10S]
-end_turn
-AI ends turn.
-[8D, 10C, JD, KS]
-[8S, JH, KC, 10S]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[8D, 10C, KS]
-[8S, JH, KC, 10S]
-end_turn
-AI discards pairs after exchange.
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-[8D, 10C, KS]
-[KC, 8S, 10S]
-end_turn
-AI ends turn.
-[10C, KS, KC]
-[10S]
-end_turn
-AI can exchange a card.
-AI attempts to exchange a card.
-[10C, KS]
-[10S]
-end_turn
-[10C, KS]
-[10S, KC]
-end_turn
-[10C, KS]
-[10S, KC]
-end_turn
-[10C, KS]
-[10S, KC]
-end_turn
-[10C, KS]
-[10S, KC]
-end_turn
-[10C, KS]
-[10S, KC]
-end_turn
-AI ends turn.
-Game Over:  Противник
-[KS]
-[KC]
-discard_pairs
-[KS]
-[KC]
-discard_pairs
+[6D, 8H, 8C, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+[6D, 8H, 8C, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+Card clicked: 8H
+Selected: 8H
+Card clicked: 8C
+Selected: 8C
+Player attacked with: 8H, 8C
+[6D, 8H, 8C, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+AI could not defend. Will need to take.
+[6D, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+[6D, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+[6D, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
+[6D, 9C, QC, KC]
+[7H, 9D, JH, KD, AH, 7C]
 
 Full traceback:
-  File "game/CardGames/Witch/scripts_witch.rpy", line 45, in script
-    jump card_games
-  File "renpy/ast.py", line 1757, in execute
-    rv = renpy.game.script.lookup(target)
-  File "renpy/script.py", line 918, in lookup
-    raise ScriptError("could not find label '%s'." % str(original))
-ScriptError: could not find label 'card_games'.
+  File "game/CardGames/Durak/scripts_durak.rpy", line 62, in script
+    call screen durak
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2015, in execute
+    self.call("execute")
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2003, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/statements.py", line 278, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/exports.py", line 3136, in call_screen
+    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ui.py", line 298, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 3325, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, **kwargs)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 4035, in interact_core
+    self.quit_event()
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 2977, in quit_event
+    renpy.display.behavior.run(renpy.config.quit_action)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/behavior.py", line 330, in run
+    return action(*args, **kwargs)
+  File "renpy/common/00action_menu.rpy", line 220, in __call__
+    layout.yesno_screen(layout.QUIT, Quit(False))
+  File "renpy/common/00layout.rpy", line 527, in yesno_screen
+    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/game.py", line 284, in invoke_in_new_context
+    return callable(*args, **kwargs)
+  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
+    rv = layout.yesno_prompt(*args)
+AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 
 While running game code:
-  File "game/CardGames/Witch/scripts_witch.rpy", line 45, in script
-    jump card_games
-ScriptError: could not find label 'card_games'.
+  File "game/CardGames/Durak/scripts_durak.rpy", line 62, in script
+    call screen durak
+  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "renpy/common/00action_menu.rpy", line 220, in __call__
+    layout.yesno_screen(layout.QUIT, Quit(False))
+  File "renpy/common/00layout.rpy", line 527, in yesno_screen
+    if renpy.invoke_in_new_context(layout.invoke_yesno_prompt, None, message):
+  File "renpy/common/00layout.rpy", line 472, in invoke_yesno_prompt
+    rv = layout.yesno_prompt(*args)
+AttributeError: 'Layout' object has no attribute 'yesno_prompt'

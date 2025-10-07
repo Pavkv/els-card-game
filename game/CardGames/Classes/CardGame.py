@@ -5,9 +5,9 @@ from Player import Player
 from Deck import Deck
 
 class CardGame:
-    def __init__(self, player_name="Вы", biased_draw=None):
+    def __init__(self, player_name="Вы", biased_draw=None, aces_low=False):
         self.deck = Deck()
-        self.player = Player(player_name)
+        self.player = Player(player_name, aces_low)
         self.opponent = None
         self.first_player = None
         self.current_turn = None
