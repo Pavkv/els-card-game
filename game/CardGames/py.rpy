@@ -331,6 +331,7 @@ init python:
         s = store
 
         # base
+        s.card_game = None
         s.in_game = True
         s.hovered_card_index = -1
         s.dealt_cards = []
