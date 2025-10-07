@@ -42,7 +42,7 @@ label witch_game_loop:
                 "Вы проиграли."
             else:
                 "Ничья."
-            jump card_games
+            jump ga_play_again
 
     if card_game.state == "opponent_turn":
 #         $ renpy.block_rollback()

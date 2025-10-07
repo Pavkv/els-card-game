@@ -48,7 +48,7 @@ label g21_game_loop:
                 "Вы проиграли."
             else:
                 "Ничья."
-            jump card_games
+            jump ga_play_again
 
     if card_game.result:
 #         $ renpy.block_rollback()

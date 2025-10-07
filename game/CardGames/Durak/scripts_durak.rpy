@@ -57,7 +57,7 @@ label durak_game_loop:
                 "Вы проиграли."
             else:
                 "Ничья."
-            jump card_games
+            jump ga_play_again
 
     call screen durak
     jump durak_game_loop
