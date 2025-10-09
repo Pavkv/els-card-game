@@ -8,7 +8,6 @@ class Player(object):
         self.name = name
         self.hand = []
         self.aces_low = aces_low
-        self.avatar = None
 
     def __str__(self):
         return "Player {} has {} cards: {}".format(
