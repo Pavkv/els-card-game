@@ -1,14 +1,4 @@
 label start_g21:
-    $ player_name = renpy.input("Введите ваше имя", length=20)
-    $ opponent_name = "Противник"
-    $ cards_bg = "images/bg/bg_14.jpg"
-    $ in_game = False
-    $ base_card_img_src = "images/cards/cards"
-    $ biased_draw = ["opponent", 0.5]
-    $ day2_game_with_Alice = False
-    $ last_winner = "player"
-    $ g21_card_num = 1
-    $ g21_aces_low = True
     $ start_card_game(Game21, "g21", game_kwargs={"initial_deal": g21_card_num, "aces_low": g21_aces_low})
 
 label g21_game_loop:
@@ -21,34 +11,11 @@ label g21_game_loop:
 
     if card_game.state == "result":
 #       $ renpy.block_rollback()
-        pause 3.0
-        hide screen card_game_base_ui
-        if in_game:
-            if card_game.result == player_name and card_game.player.total21() == 21 and ['7', 'Q', 'A'] in card_game.player.get_ranks():
-                if not persistent.achievements["Три карты"]:
-                    play sound sfx_achievement
-                    show three_cards_message at achievement_trans
-                    with dspr
-                    $ renpy.pause(3, hard=True)
-                    hide three_cards_message
-                    $ persistent.achievements["Три карты"] = True
-            if card_game.result == player_name and card_game.player.total21() == 21 and ['7', '7', '7'] == card_game.player.get_ranks():
-                if not persistent.achievements["Три топора"]:
-                    play sound sfx_achievement
-                    show three_axes_message at achievement_trans
-                    with dspr
-                    $ renpy.pause(3, hard=True)
-                    hide three_axes_message
-                    $ persistent.achievements["Три топора"] = True
-            jump expression card_game_results[card_game.result]
-        else:
-            if card_game.result == card_game.player.name:
-                "Вы выиграли!"
-            elif card_game.result == card_game.opponent.name:
-                "Вы проиграли."
-            else:
-                "Ничья."
-            jump ga_play_again
+        if card_game.result == player_name and card_game.player.total21() == 21 and ['7', 'Q', 'A'] in card_game.player.get_ranks():
+            $ renpy.call_in_new_context("show_achievement", "Три карты", "three_cards_message")
+        if card_game.result == player_name and card_game.player.total21() == 21 and ['7', '7', '7'] == card_game.player.get_ranks():
+            $ renpy.call_in_new_context("show_achievement", "Три топора", "three_axes_message")
+        $ renpy.jump("card_game_result_handler")
 
     if card_game.result:
 #         $ renpy.block_rollback()

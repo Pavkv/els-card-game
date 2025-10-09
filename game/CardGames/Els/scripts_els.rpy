@@ -15,18 +15,7 @@ label els_game_loop:
 
     if card_game.state == "result":
 #       $ renpy.block_rollback()
-        pause 3.0
-        hide screen card_game_base_ui
-        if in_game:
-            jump expression card_game_results[card_game.result]
-        else:
-            if card_game.result == card_game.player.name:
-                "Вы выиграли!"
-            elif card_game.result == card_game.opponent.name:
-                "Вы проиграли."
-            else:
-                "Ничья."
-            jump ga_play_again
+        $ renpy.jump("card_game_result_handler")
 
     if card_game.state == "opponent_turn":
 #         $ renpy.block_rollback()

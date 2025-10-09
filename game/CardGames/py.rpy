@@ -24,28 +24,12 @@ init python:
         Returns a path/displayable for the opponent avatar.
         Supports dict (prefers 'body') or string; falls back to placeholder.
         """
-        placeholder = "images/cards/avatars/empty_avatar.png"
-        try:
-            opp = getattr(store, "card_game").opponent
-            av = getattr(opp, "avatar", None)
+        global card_game_avatar
 
-            # dict: prefer 'body'
-            if isinstance(av, dict):
-                body = av.get("body")
-                if body:
-                    return body
-                # pick first string in dict if no 'body'
-                for v in av.itervalues():
-                    if isinstance(v, basestring):
-                        return v
-                return placeholder
-
-            # string path
-            if isinstance(av, basestring):
-                return av
-        except Exception:
-            pass
-        return placeholder
+        if card_game_avatar:
+            return card_game_avatar['body']
+        else:
+            return "images/cards/avatars/empty_avatar.png"
 
     def opponent_avatar_displayable(size=(150, 150), pad=6, top_pad=6):
         """
@@ -138,6 +122,30 @@ init python:
         show_anim(function=on_finish, delay=delay)
 
     # ----------------------------
+    # In-Game Control Management
+    # ----------------------------
+    def disable_ingame_controls():
+        """
+        Disables in-game menu, skipping, auto-mode, and rollback.
+        Immediately stops skipping if active.
+        """
+        renpy.game.context().fast_skip = False
+        renpy.config.allow_skipping = False
+        renpy.preferences.afm_enable = False
+        renpy.preferences.skip = False
+        renpy.preferences.skip_unseen = False
+        renpy.config.rollback_enabled = False
+        renpy.block_rollback()
+
+    def enable_ingame_controls():
+        """
+        Ress normal skipping, rollback, and menu behavior after the game ends.
+        """
+        renpy.config.allow_skipping = True
+        renpy.config.rollback_enabled = True
+        renpy.preferences.afm_enable = True
+
+    # ----------------------------
     # Game Start Function
     # ----------------------------
     def start_card_game(game_class, game_name, num_of_cards=6, game_args=(), game_kwargs={}):
@@ -153,13 +161,14 @@ init python:
         - biased_draw: optional bias config
         """
         global card_game, player_name, opponent_name, biased_draw, card_game_name, last_winner
-        global base_cover_img_src, base_card_img_src, card_game_avatar
+        global base_cover_img_src, base_card_img_src
         global dealt_cards, is_dealing, deal_cards
+
+        disable_ingame_controls()
 
         card_game = game_class(player_name, opponent_name, biased_draw, *game_args, **game_kwargs)
         card_game_name = game_name
         base_cover_img_src = base_card_img_src + "/cover.png"
-        card_game.opponent.avatar = card_game_avatar
 
         if last_winner:
             first_player_selection = last_winner
@@ -198,7 +207,7 @@ init python:
         renpy.jump(game_name + "_game_loop")
 
     # ----------------------------
-    # In Game Functions
+    # In Game Animations
     # ----------------------------
     def draw_anim(side, target_count=6, sort_hand=False, step_delay=0.1, on_finish=None):
         """
@@ -218,7 +227,7 @@ init python:
         anim_duration = 0.2
         d = 0.1  # Initial delay
 
-        # We store the cards to be drawn after animation
+        # We s the cards to be drawn after animation
         drawn_cards = []
 
         for i in range(num_to_draw):
@@ -329,9 +338,10 @@ init python:
         renpy.hide("game21")
         renpy.hide("witch")
         s = store
-
+        
         # base
         s.card_game = None
+        s.card_game_name = None
         s.in_game = True
         s.hovered_card_index = -1
         s.dealt_cards = []
