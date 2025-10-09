@@ -1,10 +1,7 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 62, in script
-    call screen durak
-  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "../../workshop/content/331470/Golden_Age/CardGames/ini.rpy", line 129, in <module>
   File "renpy/common/00action_menu.rpy", line 220, in __call__
     layout.yesno_screen(layout.QUIT, Quit(False))
   File "renpy/common/00layout.rpy", line 527, in yesno_screen
@@ -16,18 +13,14 @@ AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/CardGames/Durak/scripts_durak.rpy", line 62, in script
-    call screen durak
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2015, in execute
-    self.call("execute")
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 2003, in call
-    return renpy.statements.call(method, parsed, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/statements.py", line 278, in call
-    return method(parsed, *args, **kwargs)
-  File "renpy/common/000statements.rpy", line 569, in execute_call_screen
-    store._return = renpy.call_screen(name, *args, **kwargs)
-  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/exports.py", line 3136, in call_screen
-    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "game/CardGames/ini.rpyc", line 129, in script
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ast.py", line 928, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/python.py", line 2245, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "../../workshop/content/331470/Golden_Age/CardGames/ini.rpy", line 129, in <module>
+  File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/exports.py", line 1563, in pause
+    rv = renpy.ui.interact(mouse='pause', type='pause', roll_forward=roll_forward, pause=delay)
   File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/ui.py", line 298, in interact
     rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
   File "/Users/pavelzobov/Downloads/renpy-7.4.11-sdk/renpy/display/core.py", line 3325, in interact
@@ -51,4 +44,4 @@ AttributeError: 'Layout' object has no attribute 'yesno_prompt'
 Darwin-24.6.0-x86_64-i386-64bit
 Ren'Py 7.4.11.2266
  
-Tue Oct  7 11:26:58 2025
+Thu Oct  9 08:58:28 2025

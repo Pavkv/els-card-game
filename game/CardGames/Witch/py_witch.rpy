@@ -63,24 +63,26 @@ init python:
     # ----------------------------
     def witch_after_draw():
         """Call this after player has pressed the 'draw' button and animation finishes."""
+        global made_turn
         compute_hand_layout()
 
         game_over_check()
 
         if card_game.player.count_pairs_excluding_witch() > 0:
             card_game.user_turn = "discard_pairs"
-        elif card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+        elif card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0 and not made_turn:
             card_game.user_turn = "exchange"
         else:
             card_game.user_turn = "end_turn"
 
     def witch_after_discard():
         """Call this after player has pressed 'discard_pairs' and animation finishes."""
+        global made_turn
         compute_hand_layout()
 
         game_over_check()
 
-        if card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0:
+        if card_game.player.can_exchange_now(card_game.deck) and len(card_game.opponent.hand) > 0 and not made_turn:
             card_game.user_turn = "exchange"
         else:
             card_game.user_turn = "end_turn"
@@ -98,7 +100,9 @@ init python:
 
     def witch_end_player_turn():
         """Call this when player presses 'end_turn' button or finishes last action."""
+        global made_turn
         game_over_check()
+        made_turn = False
         card_game.state = "opponent_turn"
         compute_hand_layout()
 

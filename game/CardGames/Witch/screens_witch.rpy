@@ -33,7 +33,7 @@ screen witch():
                         text_size 18
                         action Function(discard_pairs_anim, side=0, on_finish=witch_after_discard)
 
-            elif card_game.user_turn == "exchange":
+            elif card_game.user_turn == "exchange" and not made_turn:
                 frame:
                     xsize 150
                     padding (0, 0)
@@ -41,7 +41,11 @@ screen witch():
                     textbutton "{color=#fff}Вытянуть\nкарту{/color}":
                         style "card_game_button"
                         text_size 18
-                        action [SetVariable("card_game.state", "wait_choice"), SetVariable("card_game.user_turn", None)]
+                        action [
+                            SetVariable("card_game.state", "wait_choice"),
+                            SetVariable("card_game.user_turn", None),
+                            SetVariable("made_turn", True)
+                        ]
 
             elif card_game.user_turn == "end_turn":
                 timer 0.5 action Function(witch_end_player_turn)
